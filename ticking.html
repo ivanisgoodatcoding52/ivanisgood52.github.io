@@ -61,13 +61,37 @@
     position: absolute;
     font-weight: bold;
 }
+        #countdown {
+            color: white;
+            font-size: 50px;
+            font-weight: bold;
+            position: absolute;
+            bottom: 0.0000001%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
 
     </style>
 </head>
 <body>
     <div class="container">
         <h1>AR // RY</h1>
+        <div id="countdown"></div>
         <p>PROJECT BEGINS</p>
     </div>
+<script>
+        function updateCountdown() {
+            const targetDate = new Date("January 1, 2025 00:00:00").getTime();
+            const now = new Date().getTime();
+            const timeDifference = targetDate - now;
+            const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+
+            document.getElementById("countdown").innerHTML = `${days}d ${hours}h ${minutes}m`;
+        }
+
+        setInterval(updateCountdown, 1000);
+    </script>
 </body>
 </html>
