@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Forum</title>
+    <style>
+        body {
+            background-color: #f0f8ff;
+            font-family: "Verdana", sans-serif;
+            color: #333;
+        }
+
+        .header {
+            background-color: #007acc;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .content {
+            margin: 20px auto;
+            width: 80%;
+        }
+
+        .forum-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .forum-table th, .forum-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .forum-table th {
+            background-color: #007acc;
+            color: white;
+        }
+
+        .forum-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            margin-top: 20px;
+            background-color: #007acc;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Welcome to the Retro Forum!</h1>
+    </div>
+    <div class="content">
+        <table class="forum-table">
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Author</th>
+                    <th>Replies</th>
+                    <th>Last Post</th>
+                </tr>
+            </thead>
+            <tbody id="forum-posts">
+                <!-- Posts will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+    <footer>
+        <p>© 2025 Retro Forum</p>
+    </footer>
+
+    <script>
+        // Sample JSON Data (simulating posts)
+        const posts = [
+            {
+                "topic": "My First Thread",
+                "author": "User123",
+                "replies": 5,
+                "lastPost": "Today, 2:00 PM"
+            },
+            {
+                "topic": "Retro Forum Design",
+                "author": "Admin",
+                "replies": 8,
+                "lastPost": "Yesterday, 10:00 PM"
+            }
+        ];
+
+        // Function to render the posts
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableBody = document.getElementById('forum-posts');
+            posts.forEach(post => {
+                const row = `
+                    <tr>
+                        <td><a href="#">${post.topic}</a></td>
+                        <td>${post.author}</td>
+                        <td>${post.replies}</td>
+                        <td>${post.lastPost}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        });
+    </script>
+</body>
+</html>
