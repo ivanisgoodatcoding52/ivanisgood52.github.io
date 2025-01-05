@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Emulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        select, button {
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px;
+        }
+        iframe {
+            border: none;
+            width: 100%;
+            height: 600px;
+            margin-top: 20px;
+        }
+        .emulator-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .platform {
+            width: 45%;
+            margin-bottom: 20px;
+        }
+        @media only screen and (max-width: 768px) {
+            iframe {
+                height: 400px;
+            }
+            .platform {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>iOS & Android App Emulator</h1>
+        <p>Select a version, upload your app, and start the emulator.</p>
+
+        <div class="emulator-container">
+            <!-- Android Section -->
+            <div class="platform">
+                <h2>Android Emulator</h2>
+                <label for="android-version">Select Android Version:</label>
+                <select id="android-version">
+                    <option value="1">Version 1.0</option>
+                    <option value="2">Version 2.0</option>
+                    <option value="3">Version 3.0</option>
+                </select><br>
+
+                <label for="android-upload">Upload APK:</label>
+                <input type="file" id="android-upload" accept=".apk"><br>
+
+                <button onclick="startAndroidApp()">Start Android App</button><br>
+
+                <iframe id="android-emulator" src="" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+
+            <!-- iOS Section -->
+            <div class="platform">
+                <h2>iOS Emulator</h2>
+                <label for="ios-version">Select iOS Version:</label>
+                <select id="ios-version">
+                    <option value="1">Version 1.0</option>
+                    <option value="2">Version 2.0</option>
+                    <option value="3">Version 3.0</option>
+                </select><br>
+
+                <label for="ios-upload">Upload IPA:</label>
+                <input type="file" id="ios-upload" accept=".ipa"><br>
+
+                <button onclick="startIOSApp()">Start iOS App</button><br>
+
+                <iframe id="ios-emulator" src="" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function startAndroidApp() {
+            var version = document.getElementById('android-version').value;
+            var uploadedFile = document.getElementById('android-upload').files[0];
+            
+            // Placeholder: Normally, you would upload the APK to Appetize.io, get the URL and embed it
+            // For demonstration purposes, this assumes you have already uploaded the APK.
+            if (uploadedFile) {
+                alert("Upload your APK manually to Appetize.io.");
+            }
+            
+            var appUrl = "https://appetize.io/embed/your-android-app-link?device=phone&os=android";  // Replace with actual link after upload
+            document.getElementById('android-emulator').src = appUrl;
+        }
+
+        function startIOSApp() {
+            var version = document.getElementById('ios-version').value;
+            var uploadedFile = document.getElementById('ios-upload').files[0];
+
+            // Placeholder: Normally, you would upload the IPA to Appetize.io, get the URL and embed it
+            // For demonstration purposes, this assumes you have already uploaded the IPA.
+            if (uploadedFile) {
+                alert("Upload your IPA manually to Appetize.io.");
+            }
+
+            var appUrl = "https://appetize.io/embed/your-ios-app-link?device=phone&os=ios";  // Replace with actual link after upload
+            document.getElementById('ios-emulator').src = appUrl;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('rr.jpg'); /* Update with your image path */
+            background-size: cover;
+            background-position: center;
+        }
+        .left-icons, .right-icons {
+            display: flex;
+            align-items: center;
+        }
+        .icon {
+            margin: 0 8px;
+        }
+        .battery, .charging-icon {
+            font-size: 14px;
+        }
+        .time-center {
+            flex-grow: 1;
+            text-align: right;
+            font-size: 16px;
+        }
+        .phone-screen {
+            width: 100vw;
+            height: 100vh;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+        .header {
+            text-align: center;
+            margin-top: 10px;
+            position: relative;
+            background-color: black;
+            padding: 10px 0;
+        }
+        .battery {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 14px;
+            color: white;
+        }
+        .charging-icon {
+            font-size: 14px;
+            color: white;
+            position: absolute;
+            right: 40px;
+            top: 10px;
+        }
+        .time-date {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+        .main {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+        }
+        .event-name {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .timer {
+            font-size: 48px;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .weather-widget, .schedule-container {
+            width: 300px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-family: 'Arial', sans-serif;
+            color: white;
+            text-align: center;
+            position: absolute;
+            cursor: move; /* Change cursor to indicate draggable */
+        }
+        .weather-widget {
+            top: 20px;
+            left: 20px;
+            background: url('tseries.jpeg') no-repeat center center;
+            background-size: cover;
+        }
+        .schedule-container {
+            top: 150px; /* Position below the weather widget */
+            left: 20px;
+            background: url('ok.png') no-repeat center center;
+            background-size: cover;
+        }
+        #weather {
+            margin-top: 5px;
+        }
+        #temperature {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        #weather-description {
+            display: block;
+        }
+        #location {
+            font-size: 14px;
+            display: block;
+        }
+        .schedule-container ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+        .schedule-container li {
+            margin: 5px 0;
+        }
+        .delete-button {
+            background: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            margin-left: 10px;
+        }
+        #app-container {
+           display: grid;
+           grid-template-columns: repeat(auto-fill, 80px);
+           grid-gap: 20px;
+           justify-content: center;
+       }
+
+       .app {
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           justify-content: center;
+           width: 64px;
+           height: 64px;
+           cursor: pointer;
+           position: relative;
+       }
+
+       .app img {
+           width: 64px;
+           height: 64px;
+           border-radius: 10px;
+           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+       }
+
+       .app p {
+           font-size: 10px;
+           text-align: center;
+           margin-top: 5px;
+           overflow: hidden;
+           text-overflow: ellipsis;
+           white-space: nowrap;
+           width: 64px;
+       }
+
+       .delete-app {
+           position: absolute;
+           top: -10px;
+           right: -10px;
+           background-color: red;
+           color: white;
+           font-size: 12px;
+           border: none;
+           border-radius: 50%;
+           cursor: pointer;
+       }
+
+       #add-app {
+           display: flex;
+           justify-content: center;
+           align-items: center;
+           width: 64px;
+           height: 64px;
+           background-color: #444;
+           border-radius: 10px;
+           font-size: 36px;
+           color: white;
+           cursor: pointer;
+           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+       }
+       .search-widget {
+            width: 300px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            color: white;
+            position: absolute;
+            cursor: move;
+            background-color: #333;
+            left: 30px;
+            top: 400px;
+        }
+
+        .search-widget input {
+            width: 80%;
+            padding: 10px;
+            border-radius: 4px;
+            border: none;
+            margin-right: 5px;
+        }
+
+        .search-widget button {
+            padding: 10px;
+            border-radius: 4px;
+            border: none;
+            background-color: white;
+            color: #333;
+            cursor: pointer;
+        }
+        .calculator-widget {
+           width: 250px;
+           padding: 10px;
+           border-radius: 8px;
+           background-image: url('cool.jpg'); /* Update with your custom background image */
+           background-size: cover;
+           border: 2px solid white;
+           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+           font-family: 'Arial', sans-serif;
+           color: white;
+           position: absolute;
+           cursor: move;
+           top: 500px;
+           left: 30px;
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+       }
+
+       .calculator-display {
+           width: 100%;
+           height: 60px;
+           font-size: 24px;
+           background-color: rgba(0, 0, 0, 0.8);
+           color: white;
+           text-align: right;
+           padding: 10px;
+           border-radius: 6px;
+           margin-bottom: 10px;
+       }
+
+       .calculator-buttons {
+           display: grid;
+           grid-template-columns: repeat(4, 1fr);
+           gap: 10px;
+       }
+
+       .calculator-buttons button {
+           width: 100%;
+           padding: 15px;
+           background-color: rgba(255, 255, 255, 0.1);
+           color: white;
+           font-size: 18px;
+           border: none;
+           border-radius: 6px;
+           cursor: pointer;
+       }
+
+       .calculator-buttons button:hover {
+           background-color: rgba(255, 255, 255, 0.2);
+       }
+
+       /* Draggable elements styling */
+       .draggable {
+           cursor: move;
+       }
+       .widget {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            width: 300px;
+            z-index: 1000;
+        }
+       .social-widget {
+            width: 250px;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border: 2px solid white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            top: 50px;
+            left: 30px;
+            z-index: 10;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            resize: both;
+            overflow: auto;
+        }
+        .social-panel {
+            position: fixed; /* Fixed at the bottom */
+            left: 50%; /* Center horizontally */
+            bottom: 20px; /* Space from the bottom */
+            transform: translateX(-50%); /* Center alignment */
+            background-color: #ccc; /* Gray background */
+            padding: 10px; /* Padding around icons */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            text-align: center; /* Center the icons */
+        }
+        .social-links {
+            position: fixed; /* Fixed at the bottom */
+            left: 50%; /* Center horizontally */
+            bottom: 20px; /* Space from the bottom */
+            transform: translateX(-50%); /* Center alignment */
+            text-align: center; /* Center the icons */
+        }
+        .social-icon {
+            width: 40px; /* Set width for icons */
+            height: 40px; /* Set height for icons */
+            margin: 0 10px; /* Space between icons */
+        }
+        #aboutMe {
+            top: 20px;
+            left: 20px;
+            background-image: url('https://www.transparenttextures.com/patterns/white-paper.png'); /* Add your custom background here */
+            background-color: #e0e0e0; /* Fallback color */
+            background-size: cover;
+        }
+
+        #notepad {
+            top: 150px;
+            left: 350px;
+        }
+        #notepad textarea {
+            width: 100%;
+            height: 150px;
+        }
+    </style>
+</head>
+<body onload="updateDateTime()">
+  <div id="aboutMe" class="widget draggable">
+        <h3>About Me</h3>
+        <p>Hello! I'm a passionate web developer. I love coding and creating beautiful web applications. In my free time, I enjoy reading and exploring new technologies.</p>
+    </div>
+    <div id="notepad" class="widget draggable">
+        <h3>Notepad</h3>
+        <textarea id="textEditor" placeholder="Write your notes here..."></textarea><br>
+        <button onclick="saveTextAsFile()">Save</button>
+        <input type="file" id="fileInput" style="display:none;" onchange="loadFile(event)">
+        <button onclick="document.getElementById('fileInput').click()">Open</button>
+    </div>
+    <div class="phone-screen">
+      <div class="header">
+          <div class="left-icons">
+              <span class="icon">📶</span>
+              <span class="icon">📡</span>
+          </div>
+          <div class="time-battery-container" style="display: flex; align-items: center;">
+              <div class="time-center" id="time" style="margin-right: 10px;">12:45:00 PM</div>
+        <div class="right-icons" style="display: flex; align-items: center;">
+              <span class="battery" id="battery">🔋 100%</span>
+         </div>
+       <div class="center-links" style="display: flex; gap: 20px;">
+           <a href="games.html" class="nav-link" style="color: white; text-decoration: none; background-color: gray; padding: 5px 10px; border-radius: 5px;">Games</a>
+           <a href="aboutme.html" class="nav-link" style="color: white; text-decoration: none; background-color: gray; padding: 5px 10px; border-radius: 5px;">About Me</a>
+           <a href="Academics.html" class="nav-link" style="color: white; text-decoration: none; background-color: gray; padding: 5px 10px; border-radius: 5px;">Academics</a>
+       </div>
+</div>
+
+      </div>
+        <div id="app-container">
+            <div id="add-app">+</div>
+        </div>
+        <div class="search-widget" id="search-widget">
+            <form action="https://www.google.com/search" method="get" target="_blank">
+                <input type="text" name="q" placeholder="Search Google..." required>
+                <button type="submit">Search</button>
+            </form>
+        </div>
+        <div class="main">
+            <div class="weather-widget" id="weather-widget">
+                <p id="date-time">Loading...</p>
+                <div id="weather">
+                    <span id="temperature">--°F</span><br>
+                    <span id="weather-description">Loading...</span><br>
+                    <span id="location">Loading...</span>
+                </div>
+            </div>
+            <div class="schedule-container" id="schedule-container">
+                <h2>Event Schedule</h2>
+                <ul id="schedule-list"></ul>
+                <input type="text" id="event-name" placeholder="Event Name">
+                <input type="time" id="event-start-time">
+                <input type="time" id="event-end-time">
+                <button id="add-event">Add Event</button>
+            </div>
+            <div class="social-panel">
+        <a href="https://github.com/ivanisgoodatcoding52" target="_blank">
+            <img class="social-icon" src="https://upload.wikimedia.org/wikipedia/commons/c/c2/GitHub_Invertocat_Logo.svg" alt="Github">
+        </a>
+        <a href="https://twitter.com/unnameduserplus" target="_blank">
+            <img class="social-icon" src="https://upload.wikimedia.org/wikipedia/commons/2/2d/Twitter_X.png" alt="X">
+        </a>
+        <a href="https://discordapp.com/users/983875896328990730" target="_blank">
+            <img class="social-icon" src="https://upload.wikimedia.org/wikipedia/commons/1/13/Discord_color_D.svg" alt="Discord">
+        </a>
+        <a href="https://web.roblox.com/users/2967003776/profile" target="_blank">
+            <img class="social-icon" src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Roblox_player_icon_black.svg" alt="Roblox">
+        </a>
+        <a href="https://www.youtube.com/@ivanisgood52" target="_blank">
+            <img class="social-icon" src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" alt="youtube">
+        </a>
+        <a href="https://www.reddit.com/user/Expensive_Culture530/" target="_blank">
+            <img class="social-icon" src="https://upload.wikimedia.org/wikipedia/commons/b/b4/Reddit_logo.svg" alt="reddit">
+        </a>
+<div>
+  <ul id="schedule-list"></ul>
+  <div class="event-name" id="current-event-name">Next Event: Loading...</div>
+  <div class="timer" id="current-timer">--:--</div>
+</div>
+</div>
+        <div class="calculator-widget draggable" id="calculator-widget">
+        <div class="calculator-display" id="calculator-display">0</div>
+        <div class="calculator-buttons">
+            <button onclick="clearDisplay()">C</button>
+            <button onclick="deleteLast()">DEL</button>
+            <button onclick="appendToDisplay('%')">%</button>
+            <button onclick="appendToDisplay('/')">/</button>
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button onclick="appendToDisplay('*')">*</button>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button onclick="appendToDisplay('-')">-</button>
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button onclick="appendToDisplay('+')">+</button>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button onclick="calculateResult()">=</button>
+        </div>
+<script>
+              // Schedule management
+              let events = [
+                  { name: 'Spanish 1', startTime: '08:00', endTime: '08:57' },
+                  { name: 'Health', startTime: '09:00', endTime: '09:48' },
+                  { name: 'Advanced Geometry', startTime: '09:52', endTime: '10:39' },
+                  { name: 'Residential Technology', startTime: '10:43', endTime: '11:32' },
+                  { name: 'Advisory / Lunch', startTime: '11:32', endTime: '12:32' },
+                  { name: 'Advanced Bio', startTime: '12:36', endTime: '13:23' },
+                  { name: 'World Geography', startTime: '13:27', endTime: '14:14' },
+                  { name: 'English 1', startTime: '14:18', endTime: '15:05' }
+              ];
+
+              function updateSchedule() {
+                  const scheduleList = document.getElementById('schedule-list');
+                  scheduleList.innerHTML = '';
+                  let nextEvent = null;
+
+                  events.forEach((event, index) => {
+                      const listItem = document.createElement('li');
+                      listItem.textContent = `${event.name} - ${event.startTime} to ${event.endTime}`;
+
+                      // Create a delete button
+                      const deleteButton = document.createElement('button');
+                      deleteButton.textContent = 'Delete';
+                      deleteButton.className = 'delete-button';
+                      deleteButton.onclick = () => {
+                          events.splice(index, 1); // Remove the event from the array
+                          updateSchedule(); // Update the displayed schedule
+                      };
+
+                      listItem.appendChild(deleteButton);
+                      scheduleList.appendChild(listItem);
+
+                      const now = new Date();
+                      const [startHour, startMinute] = event.startTime.split(':').map(Number);
+                      const startTime = new Date(now);
+                      startTime.setHours(startHour, startMinute, 0, 0);
+
+                      const timeDiff = startTime - now;
+
+                      if (timeDiff > 0 && (!nextEvent || timeDiff < nextEvent.timeDiff)) {
+                          nextEvent = { event, timeDiff };
+                      }
+                  });
+
+                  // Update current event and countdown timer
+                  if (nextEvent) {
+                      const { event, timeDiff } = nextEvent;
+                      document.getElementById('current-event-name').textContent = `Next Event: ${event.name}`;
+                      const minutes = Math.floor((timeDiff / 1000 / 60) % 60);
+                      const seconds = Math.floor((timeDiff / 1000) % 60);
+                      document.getElementById('current-timer').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                  } else {
+                      document.getElementById('current-event-name').textContent = 'Next Event: None';
+                      document.getElementById('current-timer').textContent = '--:--';
+                  }
+              }
+
+              function startCountdown() {
+                  setInterval(() => {
+                      updateSchedule();
+                  }, 1000); // Update every second
+              }
+
+              document.getElementById('add-event').addEventListener('click', () => {
+                  const eventName = document.getElementById('event-name').value;
+                  const eventStartTime = document.getElementById('event-start-time').value;
+                  const eventEndTime = document.getElementById('event-end-time').value;
+
+                  if (eventName && eventStartTime && eventEndTime) {
+                      events.push({ name: eventName, startTime: eventStartTime, endTime: eventEndTime });
+                      updateSchedule();
+                      document.getElementById('event-name').value = '';
+                      document.getElementById('event-start-time').value = '';
+                      document.getElementById('event-end-time').value = '';
+                  }
+              });
+
+              // Start the countdown when the page loads
+              window.onload = function() {
+                  updateSchedule();
+                  startCountdown();
+              };
+</script>
+<script>
+        // Start the countdown when the page loads
+        startCountdown();
+
+        // Weather widget functionality
+        async function fetchWeather() {
+            const apiKey = '735e6fbb66e2cab05718dfc3751c0d59'; // Insert your API key here
+            const url = `https://api.openweathermap.org/data/2.5/weather?lat=37.760&lon=-89.077&appid=${apiKey}&units=imperial`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Weather data not available');
+                }
+                const data = await response.json();
+                document.getElementById('temperature').textContent = Math.round(data.main.temp) + '°F';
+                document.getElementById('weather-description').textContent = data.weather[0].description;
+                document.getElementById('location').textContent = data.name;
+            } catch (error) {
+                console.error('Fetching weather data failed', error);
+                document.getElementById('temperature').textContent = 'N/A';
+                document.getElementById('weather-description').textContent = 'N/A';
+                document.getElementById('location').textContent = 'N/A';
+            }
+        }
+
+        function getLocationAndWeather() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    fetchWeather(position.coords.latitude, position.coords.longitude);
+                }, error => {
+                    console.error('Geolocation error:', error);
+                    document.getElementById('temperature').textContent = 'N/A';
+                    document.getElementById('weather-description').textContent = 'N/A';
+                    document.getElementById('location').textContent = 'N/A';
+                });
+            } else {
+                console.error('Geolocation is not supported by this browser.');
+                document.getElementById('temperature').textContent = 'N/A';
+                document.getElementById('weather-description').textContent = 'N/A';
+                document.getElementById('location').textContent = 'N/A';
+            }
+        }
+
+        // Battery status
+        navigator.getBattery().then(function(batt) {
+            const batteryLevel = batt.level * 100;
+            document.getElementById('battery').textContent = `🔋 ${batteryLevel}%`;
+            if (batt.charging) {
+                document.getElementById('charging-icon').style.display = 'inline';
+            } else {
+                document.getElementById('charging-icon').style.display = 'none';
+            }
+            batt.addEventListener('levelchange', () => {
+                document.getElementById('battery').textContent = `🔋 ${Math.round(batt.level * 100)}%`;
+            });
+            batt.addEventListener('chargingchange', () => {
+                document.getElementById('charging-icon').style.display = batt.charging ? 'inline' : 'none';
+            });
+        });
+
+        // Dragging functionality
+        let activeWidget = null;
+
+        function makeDraggable(element) {
+            const onMouseMove = (e) => {
+                if (activeWidget) {
+                    activeWidget.style.left = (e.clientX - offsetX) + 'px';
+                    activeWidget.style.top = (e.clientY - offsetY) + 'px';
+                }
+            };
+
+            const onMouseUp = () => {
+                activeWidget = null;
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            };
+
+            const onTouchMove = (e) => {
+                if (activeWidget) {
+                    e.preventDefault(); // Prevent scrolling
+                    activeWidget.style.left = (e.touches[0].clientX - offsetX) + 'px';
+                    activeWidget.style.top = (e.touches[0].clientY - offsetY) + 'px';
+                }
+            };
+
+            const onTouchEnd = () => {
+                activeWidget = null;
+                document.removeEventListener('touchmove', onTouchMove);
+                document.removeEventListener('touchend', onTouchEnd);
+            };
+
+            element.addEventListener('mousedown', (e) => {
+                activeWidget = element;
+                offsetX = e.clientX - element.getBoundingClientRect().left;
+                offsetY = e.clientY - element.getBoundingClientRect().top;
+
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+
+            element.addEventListener('touchstart', (e) => {
+                activeWidget = element;
+                offsetX = e.touches[0].clientX - element.getBoundingClientRect().left;
+                offsetY = e.touches[0].clientY - element.getBoundingClientRect().top;
+
+                document.addEventListener('touchmove', onTouchMove);
+                document.addEventListener('touchend', onTouchEnd);
+            });
+        }
+
+        makeDraggable(document.getElementById('weather-widget'));
+        makeDraggable(document.getElementById('schedule-container'));
+
+        setInterval(() => {
+            updateDateTime();
+            updateSchedule();
+        }, 1000);
+
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('date-time').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+            document.getElementById('time').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+            document.getElementById('date').textContent = now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+        }
+
+        getLocationAndWeather();
+        document.getElementById('add-app').addEventListener('click', function () {
+            const urlInput = prompt('Enter the URL of the website (without https://):');
+            if (urlInput) {
+                let url = urlInput.trim();
+
+                // If the URL doesn't start with http/https, add https://
+                if (!/^https?:\/\//.test(url)) {
+                    url = `https://${url}`;
+                }
+
+                const domain = new URL(url).hostname;
+                const faviconUrl = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
+
+                // Fetch the title from the website
+                fetch(url)
+                    .then(response => response.text())
+                    .then(html => {
+                        const doc = new DOMParser().parseFromString(html, 'text/html');
+                        const title = doc.querySelector('title')?.innerText || urlInput;
+                        addApp(faviconUrl, title, url);
+                    })
+                    .catch(() => {
+                        // In case of an error, use the URL as the title
+                        addApp(faviconUrl, urlInput, url);
+                    });
+            }
+        });
+        let displayValue = '';
+
+        function appendToDisplay(value) {
+            if (displayValue === '0' && value !== '.') {
+                displayValue = '';
+            }
+            displayValue += value;
+            document.getElementById('calculator-display').textContent = displayValue;
+        }
+
+        function clearDisplay() {
+            displayValue = '0';
+            document.getElementById('calculator-display').textContent = displayValue;
+        }
+
+        function deleteLast() {
+            displayValue = displayValue.slice(0, -1) || '0';
+            document.getElementById('calculator-display').textContent = displayValue;
+        }
+
+        function calculateResult() {
+            try {
+                displayValue = eval(displayValue).toString();
+            } catch {
+                displayValue = 'Error';
+            }
+            document.getElementById('calculator-display').textContent = displayValue;
+        }
+
+        // Dragging functionality
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        const calculatorWidget = document.getElementById('calculator-widget');
+
+        calculatorWidget.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            offsetX = e.clientX - calculatorWidget.getBoundingClientRect().left;
+            offsetY = e.clientY - calculatorWidget.getBoundingClientRect().top;
+            calculatorWidget.style.position = 'absolute';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                calculatorWidget.style.left = `${e.clientX - offsetX}px`;
+                calculatorWidget.style.top = `${e.clientY - offsetY}px`;
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        function addApp(faviconUrl, title, link) {
+            const appContainer = document.getElementById('app-container');
+
+            const appDiv = document.createElement('div');
+            appDiv.classList.add('app');
+            appDiv.innerHTML = `
+                <a href="${link}" target="_blank">
+                    <img src="${faviconUrl}" alt="App Icon">
+                    <p>${title}</p>
+                </a>
+                <button class="delete-app">x</button>
+            `;
+
+            // Add delete functionality
+            appDiv.querySelector('.delete-app').addEventListener('click', function () {
+                appDiv.remove();
+            });
+
+            // Insert the new app before the add button
+            appContainer.insertBefore(appDiv, document.getElementById('add-app'));
+        }
+        makeDraggable(document.getElementById('search-widget'));
+
+        function makeDraggable(element) {
+            let offsetX, offsetY, activeWidget = null;
+
+            element.addEventListener('mousedown', (e) => {
+                activeWidget = element;
+                offsetX = e.clientX - element.getBoundingClientRect().left;
+                offsetY = e.clientY - element.getBoundingClientRect().top;
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+
+            const onMouseMove = (e) => {
+                if (activeWidget) {
+                    activeWidget.style.left = (e.clientX - offsetX) + 'px';
+                    activeWidget.style.top = (e.clientY - offsetY) + 'px';
+                }
+            };
+
+            const onMouseUp = () => {
+                activeWidget = null;
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            };
+        }
+
+    </script>
+    <script>
+        // Make the widgets draggable
+        dragElement(document.getElementById("aboutMe"));
+        dragElement(document.getElementById("notepad"));
+
+        function dragElement(elmnt) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            elmnt.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        // Save text as file
+        function saveTextAsFile() {
+            const textToSave = document.getElementById("textEditor").value;
+            const textBlob = new Blob([textToSave], { type: "text/plain" });
+            const textUrl = URL.createObjectURL(textBlob);
+            const downloadLink = document.createElement("a");
+            downloadLink.href = textUrl;
+            downloadLink.download = "note.txt"; // Default filename
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+
+        // Load text from file
+        function loadFile(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById("textEditor").value = e.target.result;
+            };
+            reader.readAsText(file);
+        }
+
+        // Focus textarea on widget click
+        document.getElementById("notepad").onclick = function() {
+            document.getElementById("textEditor").focus();
+        };
+    </script>
+</body>
+</html>

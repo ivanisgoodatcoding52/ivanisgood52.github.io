@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Login Puzzle</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f9;
+        }
+        .login-box {
+            display: inline-block;
+            background-color: white;
+            padding: 20px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        input {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            width: 80%;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Infinite Login Puzzle</h1>
+<p id="challenge"></p>
+<p id="hint"></p>
+<div class="login-box">
+    <input type="text" id="solution" placeholder="Solve the puzzle" />
+    <button onclick="checkSolution()">Submit Answer</button>
+</div>
+<div class="login-box" id="login-section" style="display: none;">
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="checkLogin()">Login</button>
+</div>
+
+<script>
+    let currentTopic;
+    let currentAnswer;
+
+    function generateRandomQuestion() {
+        let questionType = Math.floor(Math.random() * 4);
+        switch (questionType) {
+            case 0:
+                return generateMathQuestion();
+            case 1:
+                return generateWordScramble();
+            case 2:
+                return generateRandomTrivia();
+            case 3:
+                return generateSimpleRiddle();
+        }
+    }
+
+    function generateMathQuestion() {
+        let num1 = Math.floor(Math.random() * 100);
+        let num2 = Math.floor(Math.random() * 100);
+        currentAnswer = (num1 + num2).toString();
+        return `What is ${num1} + ${num2}?`;
+    }
+
+    function generateWordScramble() {
+        let words = ["planet", "science", "invention", "puzzle", "challenge"];
+        let word = words[Math.floor(Math.random() * words.length)];
+        currentAnswer = word;
+        let scrambled = word.split('').sort(() => Math.random() - 0.5).join('');
+        return `Unscramble the word: ${scrambled}`;
+    }
+
+    function generateRandomTrivia() {
+        let trivia = [
+            { question: "What is the capital of Japan?", answer: "Tokyo" },
+            { question: "Who wrote 'Hamlet'?", answer: "Shakespeare" },
+            { question: "What is the chemical symbol for water?", answer: "H2O" }
+        ];
+        let randomTrivia = trivia[Math.floor(Math.random() * trivia.length)];
+        currentAnswer = randomTrivia.answer;
+        return randomTrivia.question;
+    }
+
+    function generateSimpleRiddle() {
+        let riddles = [
+            { question: "I speak without a mouth and hear without ears. What am I?", answer: "Echo" },
+            { question: "What has keys but can't open locks?", answer: "Piano" },
+            { question: "The more of this you take, the more you leave behind. What is it?", answer: "Footsteps" }
+        ];
+        let randomRiddle = riddles[Math.floor(Math.random() * riddles.length)];
+        currentAnswer = randomRiddle.answer;
+        return randomRiddle.question;
+    }
+
+    function newChallenge() {
+        document.getElementById('hint').textContent = '';
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('challenge').textContent = `Solve this to reveal the hint: ${generateRandomQuestion()}`;
+    }
+
+    function checkSolution() {
+        const userAnswer = document.getElementById('solution').value.trim();
+        if (userAnswer.toLowerCase() === currentAnswer.toLowerCase()) {
+            currentTopic = {
+                hint: "Inventor of the telephone",
+                username: "Bell",
+                password: "Telephone"
+            };
+            document.getElementById('hint').textContent = `Hint: ${currentTopic.hint}`;
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('solution').value = '';
+        } else {
+            alert("Incorrect answer, try again.");
+        }
+    }
+
+    function checkLogin() {
+        const userInput = document.getElementById('username').value.trim();
+        const passInput = document.getElementById('password').value.trim();
+        if (userInput === currentTopic.username && passInput === currentTopic.password) {
+            alert("Correct! Moving to the next puzzle.");
+            newChallenge();
+        } else {
+            alert("Incorrect username or password.");
+        }
+    }
+
+    // Start with a new challenge
+    newChallenge();
+</script>
+
+</body>
+</html>

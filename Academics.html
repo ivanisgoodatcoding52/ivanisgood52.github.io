@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academics</title>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Use Apple's San Francisco system font */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-image: url('macimg.png'); /* Mac wallpaper */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Top menu bar */
+        .menu-bar {
+            width: 100%;
+            height: 30px;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            padding: 0 10px;
+            font-size: 12px;
+        }
+
+        .menu-bar-left {
+            display: flex;
+            gap: 15px;
+        }
+
+        .menu-bar-right {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Dock at the bottom */
+        .dock {
+            width: 100%;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .dock-container {
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .dock-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+        }
+
+        .dock-icon img {
+            width: 70%;
+            height: 70%;
+        }
+
+        /* Draggable Window */
+        .window {
+            width: 400px;
+            height: 300px;
+            background-color: #f4f4f4;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            top: 20%;
+            left: 30%;
+            cursor: move;
+            overflow: hidden;
+        }
+
+        /* Window header */
+        .window-header {
+            background-color: #e8e8e8;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .window-buttons {
+            display: flex;
+            gap: 7px;
+        }
+
+        .window-buttons .button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: red; /* Red close button */
+        }
+
+        .window-buttons .button:nth-child(2) {
+            background-color: yellow; /* Minimize button */
+        }
+
+        .window-buttons .button:nth-child(3) {
+            background-color: green; /* Maximize button */
+        }
+
+        /* Window content */
+        .window-content {
+            padding: 20px;
+            font-size: 14px;
+            overflow-y: auto; /* Allow vertical scrolling */
+            height: calc(100% - 35px); /* Adjust height to account for header */
+        }
+
+        /* Custom scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Top menu bar -->
+    <div class="menu-bar">
+        <div class="menu-bar-left">
+            <span><a href="index.html" style="color: white;">Home</a></span>
+            <span><a href="aboutme.html" style="color: white;">About Me</a></span>
+            <span><a href="games.html" style="color: white;">Games</a></span>
+            <span><a href="https://www.youtube.com/@ivanisgood52" style="color: white;">YouTube</a></span>
+            <span><a href="https://www.youtube.com/redirect?event=channel_description&redir_token=QUFFLUhqbkUzdnc5Sl9iWWk2aEdtaGQ3bzN4Y29MWE1LZ3xBQ3Jtc0ttYXFkNmZuc2RpYVhWbk9FVWR5Q3YtUVFMdkwyLWVLZm93YkxQUXFiSklnLXYtMFN0aTJyR1NJdjVVTlFQOXQxV0FJd2QzajdHRVQwUXZmT0NkVWJReXRRZTByZjBEUm1hUExQcnFxdDZHaEhudzl0OA&q=discordapp.com%2Fusers%2F983875896328990730" style="color: white;">Discord</a></span>
+            <span><a href="https://x.com/unnameduserplus" style="color: white;">X</a></span>
+        </div>
+        <div class="menu-bar-right">
+            <span>Thu 9:41 AM</span>
+            <span>🔋 100%</span>
+            <span>📶</span>
+        </div>
+    </div>
+
+    <!-- Draggable Windows -->
+    <div class="window" id="draggable-window1">
+        <div class="window-header">
+            <div class="window-buttons">
+                <div class="button"></div>
+                <div class="button"></div>
+                <div class="button"></div>
+            </div>
+            <span style="margin-left: 15px;">Academics</span>
+        </div>
+        <div class="window-content">
+            Well, to continue after the about me section, here's my academics to prove I'm good at everything. <br><br>
+            Spanish 1 - 100%<br>
+            Health - 98%<br>
+            Advanced Geometry - 96%<br>
+            Residential Technology - 100%<br>
+            Advanced Biology - 99%<br>
+            World Geography - 97%<br>
+            English 1 - 98% <br><br>
+            See, ez<br>
+        </div>
+    </div>
+
+    <div class="window" id="draggable-window2" style="top: 40%; left: 50%;">
+        <div class="window-header">
+            <div class="window-buttons">
+                <div class="button"></div>
+                <div class="button"></div>
+                <div class="button"></div>
+            </div>
+            <span style="margin-left: 15px;">Extra Hobbies</span>
+        </div>
+        <div class="window-content">
+            Hobbies, at least for me, have been a wild ride ever since 2017. Here’s all of the stuff that I like to do in my spare time:<br><br>
+            <b>Coding</b>
+            1. Unity Game Development - 79%<br>
+            2. Python Scripting - 98%<br>
+            3. Web Design - 89%<br>
+            4. PHP Server management - 40%<br>
+            5. Java + JavaScript development - 84%<br>
+            6. C + C++ + C# all in 1 - 20%<br>
+            7. Lua for stuff ig - 13%<br><br>
+            <b>Languages</b><br>
+            1. English - 100%<br>
+            2. Mandarin - 99%<br>
+            3. Spanish - 70%<br><br>
+            <b>Music Production</b><br>
+            Piano - Somewhere from 50% - 70%<br>
+            Violin - Quit, 19%<br>
+            Midi - 40%<br><br>
+            <b>Art</b><br>
+            Pencil - 100%<br>
+            Painting - 60%<br>
+            Chalk - 70% - 80%<br>
+            Color Pencil - 99%<br><br>
+            <b>Sports</b><br>
+            Tennis - 70%<br>
+            Soccer - Quit<br>
+            Football - Quit<br><br>
+            <b>Extracurricular Things</b><br>
+            Advanced Algebra II - 60%<br>
+            Pre-Calculus - 34%<br>
+            ACT9 2024-2025
+            <br>
+                and more to come!
+                    </div>
+                </div>
+
+                <div class="dock">
+        <div class="dock-container">
+            <div class="dock-icon">
+                <img src="https://e7.pngegg.com/pngimages/219/382/png-clipart-macintosh-operating-systems-macos-finder-computer-icons-safari-icon-logo-smiley.png" alt="Finder">
+            </div>
+            <div class="dock-icon">
+                <img src="https://e7.pngegg.com/pngimages/597/258/png-clipart-space-shuttle-marine-mammal-fish-launchpad-marine-mammal-preview.png" alt="Launchpad">
+            </div>
+            <div class="dock-icon">
+                <img src="https://icons.iconarchive.com/icons/wineass/ios7-redesign/256/Safari-icon.png" alt="Safari">
+            </div>
+            <div class="dock-icon">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IMessage_logo.svg" alt="Messages">
+            </div>
+            <div class="dock-icon">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/62/FaceTime_iOS.svg" alt="Facetime">
+            </div>
+            <div class="dock-icon">
+                <img src="https://cdn0.iconfinder.com/data/icons/apple-apps/100/Apple_Settings-512.png" alt="Settings">
+            </div>
+        </div>
+    </div>
+
+                <script>
+                    // Make the windows draggable
+                    function makeDraggable(element) {
+                        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+                        element.onmousedown = dragMouseDown;
+
+                        function dragMouseDown(e) {
+                            e.preventDefault();
+                            // Get the mouse cursor position at startup:
+                            pos3 = e.clientX;
+                            pos4 = e.clientY;
+                            document.onmouseup = closeDragElement;
+                            // Call a function whenever the cursor moves:
+                            document.onmousemove = elementDrag;
+                        }
+
+                        function elementDrag(e) {
+                            e.preventDefault();
+                            // Calculate the new cursor position:
+                            pos1 = pos3 - e.clientX;
+                            pos2 = pos4 - e.clientY;
+                            pos3 = e.clientX;
+                            pos4 = e.clientY;
+                            // Set the element's new position:
+                            element.style.top = (element.offsetTop - pos2) + "px";
+                            element.style.left = (element.offsetLeft - pos1) + "px";
+                        }
+
+                        function closeDragElement() {
+                            // Stop moving when mouse button is released:
+                            document.onmouseup = null;
+                            document.onmousemove = null;
+                        }
+                    }
+
+                    // Apply draggable functionality to windows
+                    makeDraggable(document.getElementById("draggable-window1"));
+                    makeDraggable(document.getElementById("draggable-window2"));
+                </script>
+                <script>
+    function updateTimeAndBattery() {
+        // Get the current date and time
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+        const formattedDateTime = now.toLocaleString('en-US', options);
+
+        // Display the date and time
+        document.getElementById("date-time-display").innerText = formattedDateTime;
+
+        // Simulate battery percentage (for demonstration purposes)
+        const batteryLevel = Math.floor(Math.random() * 101); // Random battery percentage between 0 and 100
+        document.getElementById("battery-display").innerText = `Battery: ${batteryLevel}%`;
+    }
+
+    // Update the date and battery level every second
+    setInterval(updateTimeAndBattery, 1000);
+    updateTimeAndBattery(); // Initial call to set the values immediately
+</script>
+            </body>
+            </html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>no paypal account here</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        .chaotic-element {
+            position: absolute;
+            transition: all 0.5s ease;
+        }
+
+        .shape {
+            display: block;
+            border-radius: 10px;
+            position: absolute;
+        }
+
+        .toggle-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .toggle-switch {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <div class="toggle-container">
+        <label>Space Physics: </label>
+        <input type="checkbox" id="spacePhysicsToggle" class="toggle-switch">
+    </div>
+
+    <script>
+        function getRandom(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        class Shape {
+            constructor(element) {
+                this.element = element;
+                this.width = parseFloat(element.style.width);
+                this.height = parseFloat(element.style.height);
+                this.x = parseFloat(element.style.left);
+                this.y = parseFloat(element.style.top);
+                this.vx = 0;
+                this.vy = 0;
+                this.gravity = 0.2; 
+                this.friction = 0.98;
+                this.bounciness = 0.7;
+                this.mass = getRandom(1, 5);
+                this.isDragging = false;
+                this.lastX = this.x;
+                this.lastY = this.y;
+            }
+
+            applyPhysics() {
+                const isSpacePhysics = document.getElementById('spacePhysicsToggle').checked;
+
+                if (!this.isDragging) {
+                    if (!isSpacePhysics) {
+                        this.vy += this.gravity * this.mass;
+                    } else {
+                        this.vy *= 0.99;
+                        this.vx *= 0.99;  
+                    }
+                }
+
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.y + this.height > window.innerHeight && !isSpacePhysics) {
+                    this.y = window.innerHeight - this.height;
+                    this.vy *= -this.bounciness;
+                }
+
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+            }
+
+            startDragging(mouseX, mouseY) {
+                this.isDragging = true;
+                this.vx = 0;
+                this.vy = 0;
+                this.lastX = mouseX;
+                this.lastY = mouseY;
+            }
+
+            stopDragging(mouseX, mouseY) {
+                this.isDragging = false;
+                this.vx = (mouseX - this.lastX) * 0.5;
+                this.vy = (mouseY - this.lastY) * 0.5;
+            }
+
+            drag(mouseX, mouseY) {
+                if (this.isDragging) {
+                    this.x += mouseX - this.lastX;
+                    this.y += mouseY - this.lastY;
+                    this.lastX = mouseX;
+                    this.lastY = mouseY;
+                    this.element.style.left = `${this.x}px`;
+                    this.element.style.top = `${this.y}px`;
+                }
+            }
+        }
+
+        let shapes = [];
+        let currentShape = null;
+
+        function createChaoticElement() {
+            const element = document.createElement('div');
+            element.classList.add('chaotic-element');
+            const shapeType = Math.random() > 0.5 ? 'circle' : 'square'; 
+
+            const shape = document.createElement('div');
+            shape.classList.add('shape');
+            if (shapeType === 'circle') {
+                shape.style.width = `${getRandom(50, 200)}px`;
+                shape.style.height = shape.style.width;
+                shape.style.borderRadius = '50%';
+            } else {
+                shape.style.width = `${getRandom(50, 200)}px`;
+                shape.style.height = `${getRandom(50, 200)}px`;
+            }
+            shape.style.backgroundColor = getRandomColor();
+            shape.style.left = `${getRandom(0, window.innerWidth - 100)}px`;
+            shape.style.top = `${getRandom(0, window.innerHeight - 100)}px`;
+
+            document.getElementById('container').appendChild(shape);
+
+            const newShape = new Shape(shape);
+            shapes.push(newShape);
+        }
+
+        function generateChaos() {
+            document.getElementById('container').innerHTML = '';
+            const numElements = 2000;
+            for (let i = 0; i < numElements; i++) {
+                createChaoticElement();
+            }
+
+            requestAnimationFrame(updatePhysics);
+        }
+
+        function updatePhysics() {
+            shapes.forEach(shape => shape.applyPhysics());
+            requestAnimationFrame(updatePhysics);
+        }
+
+        function onMouseDown(event) {
+            for (let shape of shapes) {
+                if (event.clientX >= shape.x && event.clientX <= shape.x + shape.width &&
+                    event.clientY >= shape.y && event.clientY <= shape.y + shape.height) {
+                    currentShape = shape;
+                    currentShape.startDragging(event.clientX, event.clientY);
+                }
+            }
+        }
+
+        function onMouseMove(event) {
+            if (currentShape) {
+                currentShape.drag(event.clientX, event.clientY);
+            }
+        }
+
+        function onMouseUp(event) {
+            if (currentShape) {
+                currentShape.stopDragging(event.clientX, event.clientY);
+                currentShape = null;
+            }
+        }
+
+        window.onload = () => {
+            generateChaos();
+            setTimeout(generateChaos, 50000000);
+
+            document.addEventListener('mousedown', onMouseDown);
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        };
+    </script>
+</body>
+</html>

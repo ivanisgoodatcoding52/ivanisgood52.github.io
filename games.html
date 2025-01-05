@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Profile Finder</title>
+    <!-- Updated Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="
+        connect-src 'self' https://users.roblox.com;
+        default-src 'self';
+        img-src 'self' https://via.placeholder.com https://www.roblox.com data:;
+        style-src 'self' 'unsafe-inline';
+        script-src 'self' 'nonce-abc123';">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: url('https://ivanisgood52.neocities.org/dcbdfaf1c08058e71f65c09f7b98ff04.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .finder-form, .profile-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .finder-form input[type="text"], .finder-form input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .finder-form input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+        }
+        .profile-section {
+            display: none;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+        }
+        .profile-header img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="finder-form">
+        <h3>Search Roblox Profiles</h3>
+        <form id="profileFinder">
+            <input type="text" name="username" id="username" placeholder="Enter Roblox Username">
+            <input type="submit" value="Find Profile">
+        </form>
+    </div>
+    <div class="profile-section" id="profileSection">
+        <div class="profile-header">
+            <img src="https://via.placeholder.com/100" alt="Avatar" id="avatarImage">
+            <div>
+                <h3 id="profileUsername">Username: Placeholder</h3>
+                <p id="profileDescription">Description: Welcome to my profile!</p>
+            </div>
+        </div>
+        <div class="profile-details">
+            <p id="profileJoinDate">Join Date: January 1, 2020</p>
+            <p id="profileLogins">Logins: 123 times</p>
+            <p id="profileFriends">Friends: 45</p>
+        </div>
+    </div>
+
+    <script nonce="abc123">
+        document.getElementById('profileFinder').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+
+            if (username) {
+                try {
+                    const response = await fetch('https://users.roblox.com/v1/usernames/users', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ usernames: [username] }),
+                    });
+                    const data = await response.json();
+                    if (data.data && data.data.length > 0) {
+                        const user = data.data[0];
+                        document.getElementById('profileUsername').textContent = `Username: ${user.name}`;
+                        document.getElementById('profileDescription').textContent = `Description: ${user.description || 'No description available.'}`;
+                        document.getElementById('avatarImage').src = `https://www.roblox.com/headshot-thumbnail/image?userId=${user.id}&width=100&height=100&format=png`;
+                        document.getElementById('profileSection').style.display = 'block';
+                    } else {
+                        alert('User not found.');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert('An error occurred while fetching data.');
+                }
+            } else {
+                alert('Please enter a username.');
+            }
+        });
+    </script>
+</body>
+</html>

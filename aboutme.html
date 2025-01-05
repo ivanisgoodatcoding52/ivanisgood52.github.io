@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Me</title>
+    <link rel="stylesheet" href="https://unpkg.com/7.css">
+    <style>
+        body {
+            background-color: #e1e1e1; /* Light grey background */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .window {
+            width: 400px;
+            margin: 50px auto;
+            position: absolute;
+            cursor: move;
+        }
+        .window-body {
+            padding: 10px;
+        }
+        ul[role="menu"] {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 5px;
+            list-style-type: none;
+            margin: 0;
+        }
+
+        ul[role="menu"] li {
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        ul[role="menu"] li:hover {
+            background-color: #f0f0f0;
+        }
+
+        ul[role="menu"] ul {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 100%;
+            margin-left: 5px;
+        }
+
+        li[aria-haspopup="true"]:hover ul {
+            display: block;
+        }
+        .taskbar {
+            background-color: #1c1c1c;
+            border-top: 1px solid #555;
+            width: 100%;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0;
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.5);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        /* Start Button (Orb) */
+        .start-button {
+      width: 40px; /* Adjusted width to give space */
+      height: 40px; /* Adjusted height to give space */
+      background-image: url('./win7orb.png');
+      background-size: 100% 100%; /* Ensures the orb scales to fit the button */
+      background-repeat: no-repeat;
+      background-position: center;
+      border: none;
+      margin: 0 10px;
+      cursor: pointer;
+      outline: none;
+      position: relative;
+      top: 0; /* Center it vertically */
+      padding: 0;
+  }
+
+        .start-button:active {
+            filter: brightness(0.8);
+        }
+
+        /* Taskbar Icons */
+        .taskbar-icons {
+            display: flex;
+            align-items: center;
+            margin-right: auto;
+        }
+
+        .taskbar-icons img {
+            width: 32px;
+            height: 32px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        /* Taskbar Clock */
+        .taskbar-clock {
+            margin-left: auto;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            text-align: right;
+            padding-right: 10px;
+        }
+
+        .taskbar-clock p {
+            margin: 0;
+            line-height: 1.1;
+        }
+
+        .taskbar-clock .time {
+            font-size: 14px;
+        }
+
+        .taskbar-clock .date {
+            font-size: 12px;
+        }
+
+        /* Start Menu */
+        .start-menu {
+            position: absolute;
+            bottom: 55px;
+            left: 10px;
+            width: 300px;
+            background-color: #f3f3f3;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 999;
+        }
+
+        .start-menu header {
+            background: linear-gradient(to bottom, #4a8cca 0%, #2c6bb2 100%);
+            padding: 10px;
+            border-radius: 5px 5px 0 0;
+            color: white;
+            font-weight: bold;
+        }
+
+        .start-menu ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .start-menu ul li {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .start-menu ul li:hover {
+            background-color: #d4e6f4;
+        }
+
+        /* Start Menu with 7.css classes */
+        .start-menu ul li {
+            font-family: 'Segoe UI', sans-serif;
+            padding: 10px;
+            display: block;
+            color: #000;
+        }
+
+        /* Adding more visual feedback on hover */
+        .start-menu ul li:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #d4e6f4 100%);
+            border-radius: 3px;
+            color: #000;
+        }
+
+        .start-menu footer {
+            background-color: #f3f3f3;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+            border-radius: 0 0 5px 5px;
+            text-align: center;
+        }
+    </style>
+    <style>
+    body {
+  background-image: url('win7.jpg');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+}
+    </style>
+
+</head>
+<body>
+<div class="background">
+  <div class="window glass active" id="draggableWindow" style="max-width: 150%">
+    <div class="title-bar" id="titleBar">
+      <div class="title-bar-text">Hello!</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize"></button>
+        <button aria-label="Maximize"></button>
+        <button aria-label="Close"></button>
+      </div>
+    </div>
+    <div class="window-body has-space">
+      <p>Every good personal website requires a good and precise "About Me" section, right? <br>
+      As Rosa Parks said: <b><i>"Nah."</i></b></p>
+      <p>Hello there, I'm ivanisgood52 <b>(not revealing my irl name of course)</b>, and I am a freshman at CHS. I am somewhat an avid midi maker / piano player / what ever the f/ck people say about it, an "alright" artist, a passionate developer and engineer (thanks mark rober), and a tennis player, golf player, etc. You may or may not hear from me from some of my associates that I call "friends". Not going to reveal them of course, but you can probably guess who they are.
+
+      <h4>School Clubs</h4>
+      <p>As in every <b>normal</b> highschooler, they (probably) join some clubs. Now, I am no regular person, so therefore I get to flex my pain in this webpage. Heres a list of all of the clubs I joined. <br><br>
+        <b><i>Carterville Creators • Science Club • Chess Club • Math Team • Rocket Club • SLC • Math Team • Esports Club • Interact • FBLA • Video Game Club • Scholar Bowl • Art Club • Board Game Club</b></i>
+        <br><br>
+        So, now we got that settled, that's basically the end of this "About Me" section. Below are some buttons you can press to go to other websites or pages I guess.
+      <div class="win">
+        <a href="https://www.youtube.com/@ivanisgood52">
+      <button>My Youtube</button>
+    </a>
+<a href="https://x.com/unnameduserplus">
+<button>My Twitter</button>
+</a>
+<a href="https://discord.com/">
+<button>My discord</button>
+</a>
+<a href=html.html>
+<button>Home</button>
+</a>
+<a href=games.html>
+<button>Games</button>
+</a>
+  </div>
+    </div>
+  </div>
+</div>
+<ul id="contextMenu" role="menu" class="can-hover" style="width: 200px">
+    <li role="menuitem" tabindex="0" aria-haspopup="true">View</li>
+    <li role="menuitem" tabindex="0" aria-haspopup="true">
+        Sort by
+        <ul role="menu">
+            <li role="menuitem"><a href="#menu">Name</a></li>
+            <li role="menuitem"><a href="#menu">Size</a></li>
+            <li role="menuitem"><a href="#menu">Item type</a></li>
+            <li role="menuitem"><a href="#menu">Date modified</a></li>
+        </ul>
+    </li>
+    <li role="menuitem" class="has-divider"><a href="#menu">Refresh</a></li>
+    <button onClick="window.location.reload();">Refresh</button>
+
+    <li role="menuitem" aria-disabled="true"><a href="#menu">Paste</a></li>
+    <li role="menuitem" aria-disabled="true" class="has-divider">
+        <a href="#menu">Paste shortcut</a>
+    </li>
+    <li role="menuitem">
+        <img src="https://img.icons8.com/color/18/000000/monitor--v1.png"/>
+        <a href="#menu">Screen resolution</a>
+    </li>
+    <li role="menuitem">
+        <img src="https://img.icons8.com/color/18/000000/virtual-machine2.png"/>
+        <a href="#menu">Gadgets</a>
+    </li>
+    <li role="menuitem">
+        <img src="https://img.icons8.com/color/18/000000/remote-desktop.png"/>
+        <a href="#menu">Personalize</a>
+    </li>
+</ul>
+<div class="taskbar">
+    <!-- Start Button -->
+    <button class="start-button" onclick="toggleStartMenu()"></button>
+
+    <!-- Taskbar Icons -->
+    <div class="taskbar-icons">
+        <img src="./filemanager.webp" alt="File Explorer">
+        <img src="./mediaplayer.webp" alt="Windows Media Player">
+        <img src="./ig.svg" alt="Internet Explorer">
+        <img src="./rblx.svg" alt="Internet Explorer">
+        <img src="./steam.svg" alt="Internet Explorer">
+        <img src="./mc.svg" alt="Internet Explorer">
+        <img src="./tf2.svg" alt="Internet Explorer">
+        <img src="./unity.svg" alt="Internet Explorer">
+    </div>
+
+    <!-- Taskbar Clock -->
+    <div class="taskbar-clock">
+        <p class="time" id="time">6:35 AM</p>
+        <p class="date">09/26/2024</p>
+    </div>
+</div>
+
+<!-- Start Menu -->
+<div class="start-menu" id="startMenu">
+    <header>
+        Windows 7
+    </header>
+    <ul>
+        <li>Documents</li>
+        <li>Pictures</li>
+        <li>Music</li>
+        <li>Control Panel</li>
+        <li>Shut Down</li>
+    </ul>
+    <footer>
+        All Programs
+    </footer>
+</div>
+
+<script>
+    // Functionality to toggle start menu visibility
+    function toggleStartMenu() {
+        var startMenu = document.getElementById('startMenu');
+        if (startMenu.style.display === 'none' || startMenu.style.display === '') {
+            startMenu.style.display = 'block';
+        } else {
+            startMenu.style.display = 'none';
+        }
+    }
+
+    // Use Ctrl key to toggle the start menu
+    document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey) {
+            toggleStartMenu();
+        }
+    });
+
+    // Display current time on the taskbar
+    function updateTime() {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const formattedHours = hours % 12 || 12;
+        const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+
+        document.getElementById('time').textContent = `${formattedHours}:${formattedMinutes} ${ampm}`;
+    }
+
+    setInterval(updateTime, 1000); // Update the time every second
+    updateTime(); // Initialize the time immediately
+</script>
+<script>
+  // Make the window draggable
+  const draggableWindow = document.getElementById('draggableWindow');
+  const titleBar = document.getElementById('titleBar');
+  let isDragging = false;
+  let offsetX = 0;
+  let offsetY = 0;
+
+  titleBar.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    offsetX = e.clientX - draggableWindow.offsetLeft;
+    offsetY = e.clientY - draggableWindow.offsetTop;
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (isDragging) {
+      draggableWindow.style.left = `${e.clientX - offsetX}px`;
+      draggableWindow.style.top = `${e.clientY - offsetY}px`;
+    }
+  });
+
+  document.addEventListener('mouseup', () => {
+    isDragging = false;
+  });
+</script>
+<script>
+    const contextMenu = document.getElementById('contextMenu');
+
+    // Function to show the context menu
+    function showContextMenu(event) {
+        event.preventDefault(); // Prevent default right-click menu
+        contextMenu.style.display = 'block';
+        contextMenu.style.left = `${event.pageX}px`;
+        contextMenu.style.top = `${event.pageY}px`;
+    }
+
+    // Function to hide the context menu
+    function hideContextMenu() {
+        contextMenu.style.display = 'none';
+    }
+
+    // Listen for right-click events
+    document.addEventListener('contextmenu', showContextMenu);
+
+    // Hide the context menu when clicking anywhere else
+    document.addEventListener('click', hideContextMenu);
+</script>
+</body>
+</html>
