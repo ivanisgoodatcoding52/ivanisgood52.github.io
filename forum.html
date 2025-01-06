@@ -5,156 +5,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forum</title>
     <style>
-        /* Basic Styling for Forum */
         body {
-            background-color: #000;
+            font-family: Arial, sans-serif;
+            background: #000;
             color: #0f0;
-            font-family: "Courier New", Courier, monospace;
+            padding: 20px;
         }
         .thread {
-            margin-bottom: 20px;
-            padding: 10px;
-            background-color: #111;
             border: 1px solid #0f0;
+            padding: 10px;
+            margin: 10px 0;
         }
         .comment {
             margin-left: 20px;
-            padding: 5px;
-            background-color: #222;
-            border: 1px solid #0f0;
+            padding-left: 10px;
+            border-left: 2px dashed #0f0;
         }
-        input, textarea {
-            background-color: #222;
-            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 10px;
-            width: 300px;
+        form {
+            margin: 10px 0;
+        }
+        textarea, input[type="text"], button {
+            margin: 5px 0;
+            display: block;
         }
     </style>
 </head>
 <body>
-
     <h1>Forum</h1>
-
     <h2>Create a Thread</h2>
-    <form id="create-thread-form">
-        <input type="text" id="thread-title" placeholder="Thread Title" required><br><br>
-        <textarea id="thread-content" placeholder="Thread Content" required></textarea><br><br>
+    <form id="thread-form">
+        <input type="text" id="thread-title" placeholder="Thread Title" required />
+        <textarea id="thread-content" placeholder="Thread Content" required></textarea>
         <button type="submit">Create Thread</button>
     </form>
 
     <h2>Threads</h2>
-    <div id="threads-list"></div>
+    <div id="threads"></div>
 
-    <h2>Post a Comment</h2>
-    <form id="comment-form">
-        <input type="text" id="comment-content" placeholder="Your Comment" required><br><br>
-        <button type="submit">Post Comment</button>
-    </form>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
-    
     <script>
-        // Firebase Configuration (use your own Firebase project details here)
-        const firebaseConfig = {
-              apiKey: "AIzaSyBa8nWf9P9LSKQlYAjN_030zA1626mOdBE",
-              authDomain: "database-for-fourm-thin.firebaseapp.com",
-              projectId: "database-for-fourm-thin",
-              storageBucket: "database-for-fourm-thin.firebasestorage.app",
-              messagingSenderId: "558281111028",
-              appId: "1:558281111028:web:e04b44e01ccee6fbffb5a1",
-              measurementId: "G-EJQFVYSX67"
-        };
+        const threadsDiv = document.getElementById("threads");
+        const threadForm = document.getElementById("thread-form");
 
-        
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        // Function to create a new thread
-        document.getElementById("create-thread-form").addEventListener("submit", async function (e) {
-            e.preventDefault();
-
-            const title = document.getElementById("thread-title").value;
-            const content = document.getElementById("thread-content").value;
-
-            // Add the new thread to Firestore
-            await db.collection("threads").add({
-                title: title,
-                content: content,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-
-            // Clear input fields
-            document.getElementById("thread-title").value = "";
-            document.getElementById("thread-content").value = "";
-
-            loadThreads(); // Reload threads
-        });
-
-        // Function to post a comment to a specific thread
-        document.getElementById("comment-form").addEventListener("submit", async function (e) {
-            e.preventDefault();
-
-            const commentContent = document.getElementById("comment-content").value;
-            const threadId = "thread_id_to_be_set"; // You will need to manage which thread the comment is for
-
-            // Add the comment to Firestore under the selected thread
-            await db.collection("threads").doc(threadId).collection("comments").add({
-                content: commentContent,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-
-            document.getElementById("comment-content").value = "";
-            loadThreads(); // Reload threads and comments
-        });
-
-        // Function to load all threads and comments
-        async function loadThreads() {
-            const threadsSnapshot = await db.collection("threads").orderBy("createdAt", "desc").get();
-            const threadsList = document.getElementById("threads-list");
-            threadsList.innerHTML = "";
-
-            threadsSnapshot.forEach((doc) => {
-                const thread = doc.data();
+        // Load threads from localStorage
+        function loadThreads() {
+            const threads = JSON.parse(localStorage.getItem("threads")) || [];
+            threadsDiv.innerHTML = ""; // Clear current threads
+            threads.forEach((thread, index) => {
                 const threadDiv = document.createElement("div");
                 threadDiv.classList.add("thread");
-
                 threadDiv.innerHTML = `
                     <h3>${thread.title}</h3>
                     <p>${thread.content}</p>
-                    <div id="comments-${doc.id}"></div>
+                    <form class="comment-form" data-thread-index="${index}">
+                        <input type="text" placeholder="Add a comment" required />
+                        <button type="submit">Comment</button>
+                    </form>
+                    <div class="comments">
+                        ${thread.comments
+                            .map((comment) => `<div class="comment">${comment}</div>`)
+                            .join("")}
+                    </div>
                 `;
-
-                // Load comments for the thread
-                loadComments(doc.id);
-
-                threadsList.appendChild(threadDiv);
+                threadsDiv.appendChild(threadDiv);
             });
         }
 
-        // Function to load comments for a specific thread
-        async function loadComments(threadId) {
-            const commentsSnapshot = await db.collection("threads").doc(threadId).collection("comments").orderBy("createdAt").get();
-            const commentsDiv = document.getElementById(`comments-${threadId}`);
-            commentsDiv.innerHTML = "";
-
-            commentsSnapshot.forEach((commentDoc) => {
-                const comment = commentDoc.data();
-                const commentDiv = document.createElement("div");
-                commentDiv.classList.add("comment");
-
-                commentDiv.innerHTML = `<p>${comment.content}</p>`;
-                commentsDiv.appendChild(commentDiv);
-            });
+        // Save threads to localStorage
+        function saveThreads(threads) {
+            localStorage.setItem("threads", JSON.stringify(threads));
         }
 
-        // Initial load of threads
+        // Handle thread creation
+        threadForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const title = document.getElementById("thread-title").value;
+            const content = document.getElementById("thread-content").value;
+
+            const threads = JSON.parse(localStorage.getItem("threads")) || [];
+            threads.push({ title, content, comments: [] });
+            saveThreads(threads);
+            loadThreads();
+
+            threadForm.reset(); // Clear the form
+        });
+
+        // Handle adding comments
+        threadsDiv.addEventListener("submit", (e) => {
+            if (e.target.classList.contains("comment-form")) {
+                e.preventDefault();
+                const commentInput = e.target.querySelector("input");
+                const comment = commentInput.value;
+                const threadIndex = e.target.dataset.threadIndex;
+
+                const threads = JSON.parse(localStorage.getItem("threads")) || [];
+                threads[threadIndex].comments.push(comment);
+                saveThreads(threads);
+                loadThreads();
+            }
+        });
+
+        // Initial load
         loadThreads();
     </script>
-
 </body>
 </html>
-
