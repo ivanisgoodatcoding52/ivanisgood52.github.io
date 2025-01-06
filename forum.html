@@ -122,33 +122,39 @@
       const file = document.getElementById('thread-upload').files[0];
       const mediaPreview = file ? URL.createObjectURL(file) : null;
 
+      // Check if both title and content are provided
       if (!title || !content) {
         alert("Please provide both title and content for the thread.");
-        return;
+        return;  // Stop the function if input is incomplete
       }
 
-      // Create new thread object
-      const newThread = {
-        id: threads.length + 1,
-        title,
-        content,
-        media: mediaPreview,
-        comments: []
-      };
+      try {
+        // Create new thread object
+        const newThread = {
+          id: threads.length + 1,
+          title,
+          content,
+          media: mediaPreview,
+          comments: []  // Initialize comments as an empty array
+        };
 
-      // Add the new thread to the threads array
-      threads.push(newThread);
+        // Add the new thread to the threads array
+        threads.push(newThread);
 
-      // Save to localStorage
-      localStorage.setItem('threads', JSON.stringify(threads));
+        // Save to localStorage
+        localStorage.setItem('threads', JSON.stringify(threads));
 
-      // Render threads
-      renderThreads();
+        // Render threads
+        renderThreads();
 
-      // Reset the input fields
-      document.getElementById('thread-title').value = '';
-      document.getElementById('thread-content').value = '';
-      document.getElementById('thread-upload').value = '';
+        // Reset the input fields
+        document.getElementById('thread-title').value = '';
+        document.getElementById('thread-content').value = '';
+        document.getElementById('thread-upload').value = '';
+      } catch (error) {
+        console.error("Error creating thread:", error);
+        alert("An error occurred while creating the thread. Please try again.");
+      }
     }
 
     // Function to render threads and their comments
@@ -159,6 +165,15 @@
       threads.forEach(thread => {
         const threadElement = document.createElement('div');
         threadElement.className = 'thread';
+        
+        // Check if comments exist before using map
+        const commentsHTML = (thread.comments && Array.isArray(thread.comments)) ? thread.comments.map(comment => `
+          <div class="comment">
+            <p>${comment.content}</p>
+            ${comment.media ? `<img src="${comment.media}" alt="Comment Media" style="max-width: 100%; height: auto;"/>` : ''}
+          </div>
+        `).join('') : '';
+
         threadElement.innerHTML = `
           <h3>${thread.title}</h3>
           <p>${thread.content}</p>
@@ -170,12 +185,7 @@
               <button onclick="addComment(${thread.id})">Add Comment</button>
             </div>
             <div id="comments-list-${thread.id}">
-              ${thread.comments.map(comment => `
-                <div class="comment">
-                  <p>${comment.content}</p>
-                  ${comment.media ? `<img src="${comment.media}" alt="Comment Media" style="max-width: 100%; height: auto;"/>` : ''}
-                </div>
-              `).join('')}
+              ${commentsHTML}
             </div>
           </div>
         `;
