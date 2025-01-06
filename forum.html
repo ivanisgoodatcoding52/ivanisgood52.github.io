@@ -200,6 +200,8 @@
                 const threadId = e.target.getAttribute("data-thread-id");
                 const commentContent = e.target.querySelector("textarea").value;
 
+                if (!commentContent.trim()) return; // Do not submit empty comments
+
                 const comments = JSON.parse(localStorage.getItem("comments")) || [];
                 comments.push({
                     threadId,
