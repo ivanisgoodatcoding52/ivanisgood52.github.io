@@ -3,35 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forum</title>
+    <title>Private Forum</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #000;
+            background-color: #000;
             color: #0f0;
             padding: 20px;
         }
-        .thread {
+        .thread, .comment {
             border: 1px solid #0f0;
             padding: 10px;
             margin: 10px 0;
+            border-radius: 5px;
         }
         .comment {
             margin-left: 20px;
-            padding-left: 10px;
-            border-left: 2px dashed #0f0;
         }
         form {
-            margin: 10px 0;
+            margin: 15px 0;
         }
         textarea, input[type="text"], button {
-            margin: 5px 0;
             display: block;
+            margin: 5px 0;
+            padding: 5px;
         }
     </style>
 </head>
 <body>
-    <h1>Forum</h1>
+    <h1>Private Forum</h1>
     <h2>Create a Thread</h2>
     <form id="thread-form">
         <input type="text" id="thread-title" placeholder="Thread Title" required />
@@ -49,7 +49,7 @@
         // Load threads from localStorage
         function loadThreads() {
             const threads = JSON.parse(localStorage.getItem("threads")) || [];
-            threadsDiv.innerHTML = ""; // Clear current threads
+            threadsDiv.innerHTML = ""; // Clear the threads container
             threads.forEach((thread, index) => {
                 const threadDiv = document.createElement("div");
                 threadDiv.classList.add("thread");
@@ -61,9 +61,7 @@
                         <button type="submit">Comment</button>
                     </form>
                     <div class="comments">
-                        ${thread.comments
-                            .map((comment) => `<div class="comment">${comment}</div>`)
-                            .join("")}
+                        ${thread.comments.map(comment => `<div class="comment">${comment}</div>`).join("")}
                     </div>
                 `;
                 threadsDiv.appendChild(threadDiv);
@@ -85,7 +83,6 @@
             threads.push({ title, content, comments: [] });
             saveThreads(threads);
             loadThreads();
-
             threadForm.reset(); // Clear the form
         });
 
