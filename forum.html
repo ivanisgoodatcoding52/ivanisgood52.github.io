@@ -3,111 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retro Forum</title>
+    <title>Forum</title>
     <style>
+        /* Basic Styling for Forum */
         body {
-            background-color: #f0f8ff;
-            font-family: "Verdana", sans-serif;
-            color: #333;
+            background-color: #000;
+            color: #0f0;
+            font-family: "Courier New", Courier, monospace;
         }
-
-        .header {
-            background-color: #007acc;
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .content {
-            margin: 20px auto;
-            width: 80%;
-        }
-
-        .forum-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .forum-table th, .forum-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        .forum-table th {
-            background-color: #007acc;
-            color: white;
-        }
-
-        .forum-table tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        footer {
-            text-align: center;
+        .thread {
+            margin-bottom: 20px;
             padding: 10px;
-            margin-top: 20px;
-            background-color: #007acc;
-            color: white;
+            background-color: #111;
+            border: 1px solid #0f0;
+        }
+        .comment {
+            margin-left: 20px;
+            padding: 5px;
+            background-color: #222;
+            border: 1px solid #0f0;
+        }
+        input, textarea {
+            background-color: #222;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 10px;
+            width: 300px;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Welcome to the Retro Forum!</h1>
-    </div>
-    <div class="content">
-        <table class="forum-table">
-            <thead>
-                <tr>
-                    <th>Topic</th>
-                    <th>Author</th>
-                    <th>Replies</th>
-                    <th>Last Post</th>
-                </tr>
-            </thead>
-            <tbody id="forum-posts">
-                <!-- Posts will be dynamically added here -->
-            </tbody>
-        </table>
-    </div>
-    <footer>
-        <p>© 2025</p>
-    </footer>
 
+    <h1>Forum</h1>
+
+    <h2>Create a Thread</h2>
+    <form id="create-thread-form">
+        <input type="text" id="thread-title" placeholder="Thread Title" required><br><br>
+        <textarea id="thread-content" placeholder="Thread Content" required></textarea><br><br>
+        <button type="submit">Create Thread</button>
+    </form>
+
+    <h2>Threads</h2>
+    <div id="threads-list"></div>
+
+    <h2>Post a Comment</h2>
+    <form id="comment-form">
+        <input type="text" id="comment-content" placeholder="Your Comment" required><br><br>
+        <button type="submit">Post Comment</button>
+    </form>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+    
     <script>
-        // Sample JSON Data (simulating posts)
-        const posts = [
-            {
-                "topic": "My First Thread",
-                "author": "User123",
-                "replies": 5,
-                "lastPost": "Today, 2:00 PM"
-            },
-            {
-                "topic": "Retro Forum Design",
-                "author": "Admin",
-                "replies": 8,
-                "lastPost": "Yesterday, 10:00 PM"
-            }
-        ];
+        // Firebase Configuration (use your own Firebase project details here)
+        const firebaseConfig = {
+              apiKey: "AIzaSyBa8nWf9P9LSKQlYAjN_030zA1626mOdBE",
+              authDomain: "database-for-fourm-thin.firebaseapp.com",
+              projectId: "database-for-fourm-thin",
+              storageBucket: "database-for-fourm-thin.firebasestorage.app",
+              messagingSenderId: "558281111028",
+              appId: "1:558281111028:web:e04b44e01ccee6fbffb5a1",
+              measurementId: "G-EJQFVYSX67"
+        };
 
-        // Function to render the posts
-        document.addEventListener('DOMContentLoaded', () => {
-            const tableBody = document.getElementById('forum-posts');
-            posts.forEach(post => {
-                const row = `
-                    <tr>
-                        <td><a href="#">${post.topic}</a></td>
-                        <td>${post.author}</td>
-                        <td>${post.replies}</td>
-                        <td>${post.lastPost}</td>
-                    </tr>
-                `;
-                tableBody.innerHTML += row;
+        
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Function to create a new thread
+        document.getElementById("create-thread-form").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const title = document.getElementById("thread-title").value;
+            const content = document.getElementById("thread-content").value;
+
+            // Add the new thread to Firestore
+            await db.collection("threads").add({
+                title: title,
+                content: content,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
+
+            // Clear input fields
+            document.getElementById("thread-title").value = "";
+            document.getElementById("thread-content").value = "";
+
+            loadThreads(); // Reload threads
         });
+
+        // Function to post a comment to a specific thread
+        document.getElementById("comment-form").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const commentContent = document.getElementById("comment-content").value;
+            const threadId = "thread_id_to_be_set"; // You will need to manage which thread the comment is for
+
+            // Add the comment to Firestore under the selected thread
+            await db.collection("threads").doc(threadId).collection("comments").add({
+                content: commentContent,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            document.getElementById("comment-content").value = "";
+            loadThreads(); // Reload threads and comments
+        });
+
+        // Function to load all threads and comments
+        async function loadThreads() {
+            const threadsSnapshot = await db.collection("threads").orderBy("createdAt", "desc").get();
+            const threadsList = document.getElementById("threads-list");
+            threadsList.innerHTML = "";
+
+            threadsSnapshot.forEach((doc) => {
+                const thread = doc.data();
+                const threadDiv = document.createElement("div");
+                threadDiv.classList.add("thread");
+
+                threadDiv.innerHTML = `
+                    <h3>${thread.title}</h3>
+                    <p>${thread.content}</p>
+                    <div id="comments-${doc.id}"></div>
+                `;
+
+                // Load comments for the thread
+                loadComments(doc.id);
+
+                threadsList.appendChild(threadDiv);
+            });
+        }
+
+        // Function to load comments for a specific thread
+        async function loadComments(threadId) {
+            const commentsSnapshot = await db.collection("threads").doc(threadId).collection("comments").orderBy("createdAt").get();
+            const commentsDiv = document.getElementById(`comments-${threadId}`);
+            commentsDiv.innerHTML = "";
+
+            commentsSnapshot.forEach((commentDoc) => {
+                const comment = commentDoc.data();
+                const commentDiv = document.createElement("div");
+                commentDiv.classList.add("comment");
+
+                commentDiv.innerHTML = `<p>${comment.content}</p>`;
+                commentsDiv.appendChild(commentDiv);
+            });
+        }
+
+        // Initial load of threads
+        loadThreads();
     </script>
+
 </body>
 </html>
+
