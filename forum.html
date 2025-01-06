@@ -78,7 +78,7 @@
       border-radius: 4px;
     }
 
-    .new-thread button, .new-comment button {
+    .new-thread button, .new-comment button, .clear-button {
       padding: 10px 20px;
       border: none;
       background-color: #007BFF;
@@ -87,7 +87,7 @@
       cursor: pointer;
     }
 
-    .new-thread button:hover, .new-comment button:hover {
+    .new-thread button:hover, .new-comment button:hover, .clear-button:hover {
       background-color: #0056b3;
     }
   </style>
@@ -109,6 +109,9 @@
 
     <h2>Threads</h2>
     <div id="threads-list"></div>
+
+    <!-- Temporary Clear All Button -->
+    <button class="clear-button" onclick="clearLocalStorage()">Clear All</button>
   </section>
 
   <script>
@@ -223,6 +226,15 @@
 
       // Clear the comment input field
       document.getElementById(`comment-content-${threadId}`).value = '';
+    }
+
+    // Temporary function to clear localStorage
+    function clearLocalStorage() {
+      if (confirm("Are you sure you want to clear all threads and comments?")) {
+        localStorage.removeItem('threads'); // Clear threads from localStorage
+        threads = []; // Reset the threads array
+        renderThreads(); // Re-render threads (empty)
+      }
     }
 
     // Initialize by rendering threads from localStorage
