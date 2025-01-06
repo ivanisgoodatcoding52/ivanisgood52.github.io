@@ -14,7 +14,7 @@
         .hidden {
             display: none;
         }
-        .thread {
+        .thread, .comment {
             border: 1px solid #0f0;
             padding: 10px;
             margin: 10px 0;
@@ -122,14 +122,39 @@
                     <h3>${thread.title}</h3>
                     <p>${embedYouTubeLinks(thread.content)}</p>
                     <p><strong>Posted by:</strong> ${thread.username}</p>
+                    <h4>Comments:</h4>
+                    <div class="comments" id="comments-${thread.id}">
+                        ${loadComments(thread.id)}
+                    </div>
+                    <form class="comment-form" data-thread-id="${thread.id}">
+                        <textarea placeholder="Add a comment..." required></textarea>
+                        <button type="submit">Post Comment</button>
+                    </form>
                 `;
                 threadsDiv.appendChild(threadDiv);
             });
         }
 
+        // Utility: Load Comments from localStorage for specific thread
+        function loadComments(threadId) {
+            const comments = JSON.parse(localStorage.getItem("comments")) || [];
+            const threadComments = comments.filter(comment => comment.threadId === threadId);
+            return threadComments.map(comment => {
+                return `<div class="comment">
+                    <p>${embedYouTubeLinks(comment.content)}</p>
+                    <p><strong>Posted by:</strong> ${comment.username}</p>
+                </div>`;
+            }).join('');
+        }
+
         // Utility: Save Threads to localStorage
         function saveThreads(threads) {
             localStorage.setItem("threads", JSON.stringify(threads));
+        }
+
+        // Utility: Save Comments to localStorage
+        function saveComments(comments) {
+            localStorage.setItem("comments", JSON.stringify(comments));
         }
 
         // Handle Thread Creation
@@ -139,18 +164,20 @@
             const content = document.getElementById("thread-content").value;
 
             const threads = JSON.parse(localStorage.getItem("threads")) || [];
-            threads.push({
+            const newThread = {
+                id: Date.now(),
                 title,
                 content,
                 username: currentUsername,
-            });
+            };
 
+            threads.push(newThread);
             saveThreads(threads);
             loadThreads();
             threadForm.reset(); // Clear the form
         });
 
-        // File Upload Handling
+        // File Upload Handling for Thread
         uploadThreadFileBtn.addEventListener("click", () => {
             uploadcare.openDialog(null, { publicKey: "f19dd788c34779d91ecc" }).done((file) => {
                 file.promise().then((fileInfo) => {
@@ -164,6 +191,25 @@
                     }
                 });
             });
+        });
+
+        // Handle Comment Posting
+        threadsDiv.addEventListener("submit", (e) => {
+            if (e.target.classList.contains("comment-form")) {
+                e.preventDefault();
+                const threadId = e.target.getAttribute("data-thread-id");
+                const commentContent = e.target.querySelector("textarea").value;
+
+                const comments = JSON.parse(localStorage.getItem("comments")) || [];
+                comments.push({
+                    threadId,
+                    content: commentContent,
+                    username: currentUsername,
+                });
+
+                saveComments(comments);
+                loadThreads(); // Reload threads and comments
+            }
         });
 
         // Initial load
