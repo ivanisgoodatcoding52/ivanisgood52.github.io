@@ -28,31 +28,27 @@
             margin: 5px 0;
             padding: 5px;
         }
-        .moderator {
-            color: #f00;
-            font-weight: bold;
+        iframe, img, video {
+            max-width: 100%;
+            margin-top: 10px;
         }
-        #auth-section {
-            display: none;
+        .resizable {
+            resize: both;
+            overflow: hidden;
+            border: 1px solid #0f0;
+            margin-top: 10px;
         }
     </style>
+    <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
 </head>
 <body>
     <h1>Private Forum</h1>
-    
-    <!-- Moderator Authentication -->
-    <div id="auth-section">
-        <h2>Enter Moderator Passcode</h2>
-        <form id="auth-form">
-            <input type="password" id="auth-passcode" placeholder="Enter passcode" required />
-            <button type="submit">Submit</button>
-        </form>
-    </div>
 
     <h2>Create a Thread</h2>
     <form id="thread-form">
         <input type="text" id="thread-title" placeholder="Thread Title" required />
-        <textarea id="thread-content" placeholder="Thread Content" required></textarea>
+        <textarea id="thread-content" placeholder="Thread Content (YouTube links will be embedded automatically)" required></textarea>
+        <input type="hidden" role="uploadcare-uploader" id="file-upload" data-public-key="f19dd788c34779d91ecc" />
         <button type="submit">Create Thread</button>
     </form>
 
@@ -62,45 +58,25 @@
     <script>
         const threadsDiv = document.getElementById("threads");
         const threadForm = document.getElementById("thread-form");
-        const authForm = document.getElementById("auth-form");
-        const authSection = document.getElementById("auth-section");
-
-        const SALT = "mysalt"; // Change this to something unique
-        let isModerator = false;
-
-        // Simple hash function for obscuring passcode
-        function hashPasscode(passcode) {
-            let hash = 0;
-            for (let i = 0; i < passcode.length; i++) {
-                const char = passcode.charCodeAt(i);
-                hash = (hash << 5) - hash + char + SALT.charCodeAt(i % SALT.length);
-                hash &= hash; // Convert to 32-bit integer
-            }
-            return hash;
-        }
+        const fileUpload = document.getElementById("file-upload");
 
         // Load threads from localStorage
         function loadThreads() {
             const threads = JSON.parse(localStorage.getItem("threads")) || [];
             threadsDiv.innerHTML = ""; // Clear the threads container
-            threads.forEach((thread, index) => {
+            threads.forEach((thread) => {
                 const threadDiv = document.createElement("div");
                 threadDiv.classList.add("thread");
                 threadDiv.innerHTML = `
                     <h3>${thread.title}</h3>
-                    <p>${thread.content}</p>
-                    ${isModerator ? `<button data-thread-index="${index}" class="delete-thread">Delete Thread</button>` : ""}
-                    <form class="comment-form" data-thread-index="${index}">
-                        <input type="text" placeholder="Add a comment" required />
-                        <button type="submit">Comment</button>
-                    </form>
-                    <div class="comments">
-                        ${thread.comments.map((comment, commentIndex) => `
-                            <div class="comment">
-                                ${comment} 
-                                ${isModerator ? `<button data-thread-index="${index}" data-comment-index="${commentIndex}" class="delete-comment">Delete</button>` : ""}
-                            </div>`).join("")}
-                    </div>
+                    <p>${embedYouTubeLinks(thread.content)}</p>
+                    ${
+                        thread.fileUrl
+                            ? thread.fileType.startsWith("image/")
+                                ? `<img src="${thread.fileUrl}" alt="Uploaded Image" />`
+                                : `<video controls><source src="${thread.fileUrl}" type="${thread.fileType}">Your browser does not support the video tag.</video>`
+                            : ""
+                    }
                 `;
                 threadsDiv.appendChild(threadDiv);
             });
@@ -111,6 +87,25 @@
             localStorage.setItem("threads", JSON.stringify(threads));
         }
 
+        // Embed YouTube Links
+        function embedYouTubeLinks(content) {
+            const urlRegex = /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be|youtube-nocookie\.com)\/[^\s]+)/g;
+            return content.replace(urlRegex, (url) => {
+                const videoId = getYouTubeVideoId(url);
+                return videoId
+                    ? `<div class="resizable"><iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`
+                    : url;
+            });
+        }
+
+        // Extract YouTube Video ID
+        function getYouTubeVideoId(url) {
+            const match = url.match(
+                /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/|youtube-nocookie\.com\/(?:embed\/)?)([a-zA-Z0-9_-]{11})/
+            );
+            return match ? match[1] : null;
+        }
+
         // Handle thread creation
         threadForm.addEventListener("submit", (e) => {
             e.preventDefault();
@@ -118,67 +113,21 @@
             const content = document.getElementById("thread-content").value;
 
             const threads = JSON.parse(localStorage.getItem("threads")) || [];
-            threads.push({ title, content, comments: [] });
+
+            const fileUrl = fileUpload.value ? fileUpload.value : null;
+            const fileType = fileUpload.dataset.fileType || null;
+
+            threads.push({
+                title,
+                content,
+                fileUrl,
+                fileType,
+            });
+
             saveThreads(threads);
             loadThreads();
             threadForm.reset(); // Clear the form
         });
-
-        // Handle adding comments
-        threadsDiv.addEventListener("submit", (e) => {
-            if (e.target.classList.contains("comment-form")) {
-                e.preventDefault();
-                const commentInput = e.target.querySelector("input");
-                const comment = commentInput.value;
-                const threadIndex = e.target.dataset.threadIndex;
-
-                const threads = JSON.parse(localStorage.getItem("threads")) || [];
-                threads[threadIndex].comments.push(comment);
-                saveThreads(threads);
-                loadThreads();
-            }
-        });
-
-        // Handle moderator authentication
-        authForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            const passcode = document.getElementById("auth-passcode").value;
-            const hashedPasscode = hashPasscode(passcode);
-
-            if (hashedPasscode === hashPasscode("mysecretpasscode")) { // Replace with your hashed passcode
-                isModerator = true;
-                authSection.style.display = "none"; // Hide authentication form
-                loadThreads();
-            } else {
-                alert("Incorrect passcode!");
-            }
-        });
-
-        // Handle thread deletion
-        threadsDiv.addEventListener("click", (e) => {
-            if (e.target.classList.contains("delete-thread")) {
-                const threadIndex = e.target.dataset.threadIndex;
-                const threads = JSON.parse(localStorage.getItem("threads")) || [];
-                threads.splice(threadIndex, 1);
-                saveThreads(threads);
-                loadThreads();
-            }
-
-            // Handle comment deletion
-            if (e.target.classList.contains("delete-comment")) {
-                const threadIndex = e.target.dataset.threadIndex;
-                const commentIndex = e.target.dataset.commentIndex;
-                const threads = JSON.parse(localStorage.getItem("threads")) || [];
-                threads[threadIndex].comments.splice(commentIndex, 1);
-                saveThreads(threads);
-                loadThreads();
-            }
-        });
-
-        // Show the authentication form if not authenticated
-        if (!isModerator) {
-            authSection.style.display = "block";
-        }
 
         // Initial load
         loadThreads();
