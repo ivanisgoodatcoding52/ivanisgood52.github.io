@@ -1,250 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Private Forum</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #000;
-            color: #0f0;
-            padding: 20px;
-        }
-        .hidden {
-            display: none;
-        }
-        .thread, .comment {
-            border: 1px solid #0f0;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-        }
-        form {
-            margin: 15px 0;
-        }
-        textarea, input[type="text"], button {
-            display: block;
-            margin: 5px 0;
-            padding: 5px;
-        }
-        iframe, img, video {
-            max-width: 100%;
-            margin-top: 10px;
-        }
-        .resizable {
-            resize: both;
-            overflow: hidden;
-            border: 1px solid #0f0;
-            margin-top: 10px;
-        }
-        .mod-tools {
-            background-color: #333;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        .mod-button {
-            background-color: red;
-            color: white;
-            padding: 5px;
-            cursor: pointer;
-            border: none;
-            border-radius: 3px;
-        }
-    </style>
-    <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forum</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .thread-container {
+      width: 80%;
+      margin: 0 auto;
+    }
+
+    .thread {
+      margin-bottom: 30px;
+    }
+
+    h3 {
+      color: #2c3e50;
+    }
+
+    .comments {
+      margin-top: 20px;
+    }
+
+    .comment {
+      margin-bottom: 10px;
+    }
+
+    input[type="file"] {
+      margin-top: 10px;
+    }
+
+    .media-preview {
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .youtube-preview iframe {
+      width: 100%;
+      height: 315px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Private Forum</h1>
+  <header>
+    <h1>Forum</h1>
+  </header>
 
-    <div id="username-form" class="hidden">
-        <h2>Set Your Username</h2>
-        <form>
-            <input type="text" id="username-input" placeholder="Enter your username" required />
-            <button type="button" id="save-username">Save Username</button>
-        </form>
+  <section class="thread-container">
+    <h2>Threads</h2>
+    <div class="thread">
+      <h3>Example Thread Title</h3>
+      <p>This is an example thread.</p>
+
+      <!-- Thread image/video upload -->
+      <label for="thread-upload">Upload an image or video:</label>
+      <input type="file" id="thread-upload" name="thread-upload" accept="image/*,video/*">
+
+      <div class="media-preview" id="thread-media-preview"></div>
+
+      <!-- YouTube embed -->
+      <h4>Embed a YouTube video:</h4>
+      <input type="text" id="youtube-link" placeholder="Paste YouTube URL">
+      <button onclick="embedYouTube()">Embed Video</button>
+      <div class="youtube-preview" id="youtube-preview"></div>
+
+      <div class="comments">
+        <h4>Comments</h4>
+        <div class="comment">
+          <p>Great thread!</p>
+          <!-- Comment image/video upload -->
+          <label for="comment-upload">Upload a comment image or video:</label>
+          <input type="file" id="comment-upload" accept="image/*,video/*">
+          <div class="media-preview" id="comment-media-preview"></div>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <div id="forum-content" class="hidden">
-        <h2>Create a Thread</h2>
-        <form id="thread-form">
-            <input type="text" id="thread-title" placeholder="Thread Title" required />
-            <textarea id="thread-content" placeholder="Thread Content (YouTube links will be embedded automatically)" required></textarea>
-            <button type="button" id="upload-thread-file">Add Image/Video</button>
-            <button type="submit">Create Thread</button>
-        </form>
+  <script>
+    // Handle thread media upload
+    document.getElementById('thread-upload').addEventListener('change', function (event) {
+      const preview = document.getElementById('thread-media-preview');
+      preview.innerHTML = ''; // Clear previous preview
 
-        <h2>Threads</h2>
-        <div id="threads"></div>
-    </div>
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const mediaElement = file.type.startsWith('image') ? 
+            new Image() : document.createElement('video');
+          mediaElement.src = e.target.result;
 
-    <script>
-        const threadsDiv = document.getElementById("threads");
-        const threadForm = document.getElementById("thread-form");
-        const usernameForm = document.getElementById("username-form");
-        const forumContent = document.getElementById("forum-content");
-        const usernameInput = document.getElementById("username-input");
-        const saveUsernameBtn = document.getElementById("save-username");
-        const uploadThreadFileBtn = document.getElementById("upload-thread-file");
-        const modEmail = "hanlin520131@gmail.com";
-        let currentUsername = localStorage.getItem("username");
-        let currentEmail = localStorage.getItem("email");
+          if (file.type.startsWith('video')) {
+            mediaElement.controls = true;
+          }
+          preview.appendChild(mediaElement);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
-        if (!currentUsername) {
-            usernameForm.classList.remove("hidden");
-        } else {
-            forumContent.classList.remove("hidden");
-        }
+    // Handle comment media upload
+    document.getElementById('comment-upload').addEventListener('change', function (event) {
+      const preview = document.getElementById('comment-media-preview');
+      preview.innerHTML = ''; // Clear previous preview
 
-        saveUsernameBtn.addEventListener("click", () => {
-            const username = usernameInput.value.trim();
-            if (username) {
-                localStorage.setItem("username", username);
-                currentUsername = username;
-                usernameForm.classList.add("hidden");
-                forumContent.classList.remove("hidden");
-            } else {
-                alert("Please enter a valid username.");
-            }
-        });
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const mediaElement = file.type.startsWith('image') ? 
+            new Image() : document.createElement('video');
+          mediaElement.src = e.target.result;
 
-        // Utility: Embed YouTube Links
-        function embedYouTubeLinks(content) {
-            const urlRegex = /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be|youtube-nocookie\.com)\/[^\s]+)/g;
-            return content.replace(urlRegex, (url) => {
-                const videoId = getYouTubeVideoId(url);
-                return videoId
-                    ? `<div class="resizable"><iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`
-                    : url;
-            });
-        }
+          if (file.type.startsWith('video')) {
+            mediaElement.controls = true;
+          }
+          preview.appendChild(mediaElement);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
-        function getYouTubeVideoId(url) {
-            const match = url.match(
-                /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/|youtube-nocookie\.com\/(?:embed\/)?)([a-zA-Z0-9_-]{11})/
-            );
-            return match ? match[1] : null;
-        }
+    // Handle YouTube video embedding
+    function embedYouTube() {
+      const url = document.getElementById('youtube-link').value;
+      const videoId = extractYouTubeVideoId(url);
 
-        // Utility: Load Threads from localStorage
-        function loadThreads() {
-            const threads = JSON.parse(localStorage.getItem("threads")) || [];
-            threadsDiv.innerHTML = ""; // Clear the threads container
-            threads.forEach((thread) => {
-                const threadDiv = document.createElement("div");
-                threadDiv.classList.add("thread");
-                threadDiv.innerHTML = `
-                    <h3>${thread.title}</h3>
-                    <p>${embedYouTubeLinks(thread.content)}</p>
-                    <p><strong>Posted by:</strong> ${thread.username}</p>
-                    <h4>Comments:</h4>
-                    <div class="comments" id="comments-${thread.id}">
-                        ${loadComments(thread.id)}
-                    </div>
-                    <form class="comment-form" data-thread-id="${thread.id}">
-                        <textarea placeholder="Add a comment..." required></textarea>
-                        <button type="submit">Post Comment</button>
-                    </form>
-                    ${currentEmail === modEmail ? `<div class="mod-tools"><button class="mod-button" data-thread-id="${thread.id}" onclick="deleteThread(${thread.id})">Delete Thread</button></div>` : ""}
-                `;
-                threadsDiv.appendChild(threadDiv);
-            });
-        }
+      if (videoId) {
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.youtube.com/embed/${videoId}`;
+        iframe.frameborder = 0;
+        iframe.allow = "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture";
+        iframe.allowfullscreen = true;
 
-        // Utility: Load Comments from localStorage for specific thread
-        function loadComments(threadId) {
-            const comments = JSON.parse(localStorage.getItem("comments")) || [];
-            const threadComments = comments.filter(comment => comment.threadId === threadId);
-            return threadComments.map(comment => {
-                return `<div class="comment">
-                    <p><strong>${comment.username}:</strong> ${embedYouTubeLinks(comment.content)}</p>
-                </div>`;
-            }).join('');
-        }
+        document.getElementById('youtube-preview').innerHTML = '';
+        document.getElementById('youtube-preview').appendChild(iframe);
+      } else {
+        alert("Invalid YouTube URL");
+      }
+    }
 
-        // Utility: Save Threads to localStorage
-        function saveThreads(threads) {
-            localStorage.setItem("threads", JSON.stringify(threads));
-        }
-
-        // Utility: Save Comments to localStorage
-        function saveComments(comments) {
-            localStorage.setItem("comments", JSON.stringify(comments));
-        }
-
-        // Handle Thread Creation
-        threadForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            const title = document.getElementById("thread-title").value;
-            const content = document.getElementById("thread-content").value;
-
-            const threads = JSON.parse(localStorage.getItem("threads")) || [];
-            const newThread = {
-                id: Date.now(),
-                title,
-                content,
-                username: currentUsername,
-            };
-
-            threads.push(newThread);
-            saveThreads(threads);
-            loadThreads();
-            threadForm.reset(); // Clear the form
-        });
-
-        // File Upload Handling for Thread
-        uploadThreadFileBtn.addEventListener("click", () => {
-            uploadcare.openDialog(null, { publicKey: "f19dd788c34779d91ecc" }).done((file) => {
-                file.promise().then((fileInfo) => {
-                    const threadContent = document.getElementById("thread-content");
-                    if (fileInfo.isImage) {
-                        threadContent.value += `\n<img src="${fileInfo.cdnUrl}" alt="${fileInfo.name}" />`;
-                    } else if (fileInfo.mimeType.startsWith("video")) {
-                        threadContent.value += `\n<video controls src="${fileInfo.cdnUrl}"></video>`;
-                    } else {
-                        threadContent.value += `\n<a href="${fileInfo.cdnUrl}" target="_blank">${fileInfo.name}</a>`;
-                    }
-                });
-            });
-        });
-
-        // Handle Comment Posting
-        threadsDiv.addEventListener("submit", (e) => {
-            if (e.target.classList.contains("comment-form")) {
-                e.preventDefault();
-                const threadId = e.target.getAttribute("data-thread-id");
-                const commentContent = e.target.querySelector("textarea").value;
-
-                if (!commentContent.trim()) return; // Do not submit empty comments
-
-                const comments = JSON.parse(localStorage.getItem("comments")) || [];
-                comments.push({
-                    threadId,
-                    content: commentContent,
-                    username: currentUsername,
-                });
-
-                saveComments(comments);
-                loadThreads(); // Reload threads and comments
-            }
-        });
-
-        // Moderator Function: Delete Thread
-        function deleteThread(threadId) {
-            let threads = JSON.parse(localStorage.getItem("threads")) || [];
-            threads = threads.filter(thread => thread.id !== threadId);
-            saveThreads(threads);
-
-            let comments = JSON.parse(localStorage.getItem("comments")) || [];
-            comments = comments.filter(comment => comment.threadId !== threadId);
-            saveComments(comments);
-
-            loadThreads(); // Reload threads after deletion
-        }
-
-        // Initial load
-        loadThreads();
-    </script>
+    // Extract video ID from YouTube URL
+    function extractYouTubeVideoId(url) {
+      const match = url.match(/(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+      return match ? match[1] : null;
+    }
+  </script>
 </body>
 </html>
