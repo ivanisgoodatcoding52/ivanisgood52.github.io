@@ -22,6 +22,10 @@
 
     .thread {
       margin-bottom: 30px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-top: 20px;
     }
 
     h3 {
@@ -30,10 +34,15 @@
 
     .comments {
       margin-top: 20px;
+      border-top: 1px solid #ddd;
+      padding-top: 20px;
     }
 
     .comment {
       margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
     }
 
     input[type="file"] {
@@ -52,6 +61,35 @@
       width: 100%;
       height: 315px;
     }
+
+    .new-thread, .new-comment {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+
+    .new-thread input, .new-comment input, .new-thread textarea, .new-comment textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .new-thread button, .new-comment button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #007BFF;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .new-thread button:hover, .new-comment button:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
@@ -60,105 +98,125 @@
   </header>
 
   <section class="thread-container">
-    <h2>Threads</h2>
-    <div class="thread">
-      <h3>Example Thread Title</h3>
-      <p>This is an example thread.</p>
-
-      <!-- Thread image/video upload -->
+    <div class="new-thread">
+      <h3>Create a New Thread</h3>
+      <input type="text" id="thread-title" placeholder="Enter thread title" />
+      <textarea id="thread-content" placeholder="Write your thread content"></textarea>
       <label for="thread-upload">Upload an image or video:</label>
-      <input type="file" id="thread-upload" name="thread-upload" accept="image/*,video/*">
-
-      <div class="media-preview" id="thread-media-preview"></div>
-
-      <!-- YouTube embed -->
-      <h4>Embed a YouTube video:</h4>
-      <input type="text" id="youtube-link" placeholder="Paste YouTube URL">
-      <button onclick="embedYouTube()">Embed Video</button>
-      <div class="youtube-preview" id="youtube-preview"></div>
-
-      <div class="comments">
-        <h4>Comments</h4>
-        <div class="comment">
-          <p>Great thread!</p>
-          <!-- Comment image/video upload -->
-          <label for="comment-upload">Upload a comment image or video:</label>
-          <input type="file" id="comment-upload" accept="image/*,video/*">
-          <div class="media-preview" id="comment-media-preview"></div>
-        </div>
-      </div>
+      <input type="file" id="thread-upload" accept="image/*,video/*" />
+      <button onclick="createThread()">Create Thread</button>
     </div>
+
+    <h2>Threads</h2>
+    <div id="threads-list"></div>
   </section>
 
   <script>
-    // Handle thread media upload
-    document.getElementById('thread-upload').addEventListener('change', function (event) {
-      const preview = document.getElementById('thread-media-preview');
-      preview.innerHTML = ''; // Clear previous preview
+    // Load threads from localStorage or initialize if empty
+    let threads = JSON.parse(localStorage.getItem('threads')) || [];
 
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const mediaElement = file.type.startsWith('image') ? 
-            new Image() : document.createElement('video');
-          mediaElement.src = e.target.result;
+    // Function to create a new thread
+    function createThread() {
+      const title = document.getElementById('thread-title').value;
+      const content = document.getElementById('thread-content').value;
+      const file = document.getElementById('thread-upload').files[0];
+      const mediaPreview = file ? URL.createObjectURL(file) : null;
 
-          if (file.type.startsWith('video')) {
-            mediaElement.controls = true;
-          }
-          preview.appendChild(mediaElement);
-        };
-        reader.readAsDataURL(file);
+      if (!title || !content) {
+        alert("Please provide both title and content for the thread.");
+        return;
       }
-    });
 
-    // Handle comment media upload
-    document.getElementById('comment-upload').addEventListener('change', function (event) {
-      const preview = document.getElementById('comment-media-preview');
-      preview.innerHTML = ''; // Clear previous preview
+      // Create new thread object
+      const newThread = {
+        id: threads.length + 1,
+        title,
+        content,
+        media: mediaPreview,
+        comments: []
+      };
 
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const mediaElement = file.type.startsWith('image') ? 
-            new Image() : document.createElement('video');
-          mediaElement.src = e.target.result;
+      // Add the new thread to the threads array
+      threads.push(newThread);
 
-          if (file.type.startsWith('video')) {
-            mediaElement.controls = true;
-          }
-          preview.appendChild(mediaElement);
-        };
-        reader.readAsDataURL(file);
-      }
-    });
+      // Save to localStorage
+      localStorage.setItem('threads', JSON.stringify(threads));
 
-    // Handle YouTube video embedding
-    function embedYouTube() {
-      const url = document.getElementById('youtube-link').value;
-      const videoId = extractYouTubeVideoId(url);
+      // Render threads
+      renderThreads();
 
-      if (videoId) {
-        const iframe = document.createElement('iframe');
-        iframe.src = `https://www.youtube.com/embed/${videoId}`;
-        iframe.frameborder = 0;
-        iframe.allow = "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture";
-        iframe.allowfullscreen = true;
-
-        document.getElementById('youtube-preview').innerHTML = '';
-        document.getElementById('youtube-preview').appendChild(iframe);
-      } else {
-        alert("Invalid YouTube URL");
-      }
+      // Reset the input fields
+      document.getElementById('thread-title').value = '';
+      document.getElementById('thread-content').value = '';
+      document.getElementById('thread-upload').value = '';
     }
 
-    // Extract video ID from YouTube URL
-    function extractYouTubeVideoId(url) {
-      const match = url.match(/(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-      return match ? match[1] : null;
+    // Function to render threads and their comments
+    function renderThreads() {
+      const threadsList = document.getElementById('threads-list');
+      threadsList.innerHTML = '';
+
+      threads.forEach(thread => {
+        const threadElement = document.createElement('div');
+        threadElement.className = 'thread';
+        threadElement.innerHTML = `
+          <h3>${thread.title}</h3>
+          <p>${thread.content}</p>
+          ${thread.media ? `<img src="${thread.media}" alt="Thread Media" style="max-width: 100%; height: auto;"/>` : ''}
+          <div class="comments">
+            <h4>Comments</h4>
+            <div class="new-comment">
+              <textarea id="comment-content-${thread.id}" placeholder="Write a comment"></textarea>
+              <button onclick="addComment(${thread.id})">Add Comment</button>
+            </div>
+            <div id="comments-list-${thread.id}">
+              ${thread.comments.map(comment => `
+                <div class="comment">
+                  <p>${comment.content}</p>
+                  ${comment.media ? `<img src="${comment.media}" alt="Comment Media" style="max-width: 100%; height: auto;"/>` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        threadsList.appendChild(threadElement);
+      });
     }
+
+    // Function to add a comment under a thread
+    function addComment(threadId) {
+      const commentContent = document.getElementById(`comment-content-${threadId}`).value;
+      const file = document.querySelector(`#comment-upload-${threadId}`) ? document.querySelector(`#comment-upload-${threadId}`).files[0] : null;
+      const mediaPreview = file ? URL.createObjectURL(file) : null;
+
+      if (!commentContent) {
+        alert("Please write a comment.");
+        return;
+      }
+
+      const thread = threads.find(t => t.id === threadId);
+
+      // Create a new comment object
+      const newComment = {
+        content: commentContent,
+        media: mediaPreview
+      };
+
+      // Add the new comment to the thread's comments
+      thread.comments.push(newComment);
+
+      // Save the updated threads to localStorage
+      localStorage.setItem('threads', JSON.stringify(threads));
+
+      // Render the updated threads
+      renderThreads();
+
+      // Clear the comment input field
+      document.getElementById(`comment-content-${threadId}`).value = '';
+    }
+
+    // Initialize by rendering threads from localStorage
+    renderThreads();
   </script>
 </body>
 </html>
