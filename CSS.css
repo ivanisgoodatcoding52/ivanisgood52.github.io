@@ -1,0 +1,164 @@
+body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            background-image: url('Sources/101.webp');
+            background-size: cover;
+            background-repeat: no-repeat;
+            color:white;
+            font-family: Arial, sans-serif; }
+
+
+.logo-topbar {height: 60px;
+width: auto;
+border-top: 2px solid rgba(255, 255, 255, 0.635);
+border-bottom: 2px solid rgb(255, 255, 255, 0.635);
+backdrop-filter: blur(12px);}  
+
+.topbar {
+  width: auto;
+  border-bottom: 2px solid rgb(255, 255, 255, 0.635);
+  backdrop-filter: blur(12px);
+  display: block;
+  text-align: center;
+  font-weight: 600;}
+  
+.downloads-container { width:73%;
+border:1px rgba(0, 0, 0, 0.5) solid;
+background-color:rgba(255, 255, 255, 0.2);
+color:black;
+margin-left:auto;
+margin-right:auto;
+margin-top:1%;
+padding-bottom: 2%;
+border-radius:2px;}
+
+.awards-container { width:73%;
+border:1px rgba(0, 0, 0, 0.5) solid;
+background-color:rgba(255, 255, 255, 0.2);
+color:black;
+margin-left:auto;
+margin-right:auto;
+margin-top:5%;
+border-radius:2px;}
+
+.awards-subcontainer { width:40%;
+border:1px rgba(0, 0, 0, 0.5) solid;
+background-color:rgba(255, 255, 255, 0.2);
+color:black;
+margin-left:auto;
+margin-right:auto;
+margin-top:2%;
+margin-bottom:1%;
+border-radius:2px;
+padding:10px;}
+
+
+#downloads-logo {width:50%;
+display:block;
+margin-left:auto;
+margin-right:auto;
+margin-bottom:-20px}
+
+#awards-logo {width:50%;
+display:block;
+margin-left:auto;
+margin-right:auto;
+margin-bottom:-20px}
+
+.downloads-text {margin-left:10px;}
+
+
+#downloads-title {text-align:center;
+ font-size:35px;
+ font-weight:550;}
+
+#awards-title {text-align:center;
+ font-size:35px;
+ font-weight:550;}
+  
+.install-option {border:1px rgba(0,0,0,1) solid;
+  display:block;
+  border-radius:5px;
+  width:400px;
+  margin-right:auto;
+  margin-left:auto;
+  margin-bottom:10px;
+  background-color:rgba(5,5,5,0.1);
+  padding:none;
+  
+  }
+
+#install-icon {display:inline-block;
+  margin-left:10px;
+  width:50px;
+
+  }
+
+#install-title {display:inline-block;
+  font-weight:550;
+  font-size:25px;
+  vertical-align: 50%;
+  color:black;
+  }
+
+#download-link {text-decoration:none;}
+
+#install-extra {font-size:9px;
+font-weight:550;
+color:rgba(0,0,0,0.6);
+margin:1px;
+margin-left:16%;
+margin-top:-27px;
+margin-bottom:4%;}
+
+#install-extra:hover {text-decoration:underline;}
+#install-title:hover {text-decoration:underline;}
+
+#awards-title {font-weight:550;
+  color:black;
+  font-size:22px;
+  text-align:center; }
+
+#winner {font-size:18px;
+  text-align:center;}
+
+#logo {height: 55px;
+width: 270px;
+display: block;
+margin-left: auto;
+margin-right: auto;
+margin-top: 3px;
+margin-bottom: 3px;}
+
+#downloads-link {display: inline;
+text-decoration: none;
+color: black;
+padding: 5px;
+display: inline-block;}
+
+#home-link {display: inline;
+  text-decoration: none;
+  color: black;
+  padding: 6px;
+  display: inline-block;}
+
+#index-text {text-align: center;
+color: black;}
+
+#footer {text-align: center;
+color: rgba(255, 255, 255, 0.63);
+margin-top: auto;
+}
+
+
+
+
+
+
+
+
+
+
+
