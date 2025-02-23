@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ObscureYT</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        iframe {
+            width: 80%;
+            height: 500px;
+            border: none;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .slider-container {
+            margin-top: 20px;
+        }
+        .slider-label {
+            font-size: 16px;
+        }
+        .tag-input-container {
+            margin-top: 20px;
+        }
+        .tag-label {
+            font-size: 16px;
+        }
+        .tag-input {
+            padding: 5px;
+            font-size: 16px;
+            width: 50%;
+        }
+        .error-message {
+            color: red;
+            margin-top: 20px;
+        }
+        .quota-reset {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        body {
+    font-family: Arial, sans-serif;
+    background-color: #ccc;
+    color: #333;
+    text-align: center;
+}
+
+h1 {
+    font-size: 24px;
+    font-weight: bold;
+    background-color: #eee;
+    padding: 10px;
+    border-bottom: 2px solid #aaa;
+}
+
+iframe {
+    width: 640px;
+    height: 360px;
+    border: 3px solid #999;
+    background-color: black;
+}
+
+button {
+    background-color: #d6d6d6;
+    border: 1px solid #888;
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #c2c2c2;
+}
+
+.slider-container, .tag-input-container {
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.tag-input {
+    border: 1px solid #888;
+    padding: 5px;
+    font-size: 14px;
+    width: 50%;
+    background-color: white;
+}
+
+.error-message {
+    color: red;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.quota-reset {
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+    </style>
+</head>
+<body>
+    <h1>ObscureYT</h1>
+    <h4>A PetitTube Inspired Page</h4>
+    <iframe id="videoFrame" src="" allowfullscreen></iframe>
+    <br>
+    <button onclick="loadRandomVideo()">Load Random Video</button>
+
+    <div class="slider-container">
+        <label for="timeSlider" class="slider-label">Select Time Range (in Days):</label>
+        <input type="range" id="timeSlider" min="1" max="365" value="30">
+        <span id="sliderValue">30</span> days
+    </div>
+
+    <div class="tag-input-container">
+        <label for="tagsInput" class="tag-label">Enter Tags (comma separated):</label>
+        <input type="text" id="tagsInput" class="tag-input" placeholder="e.g., nature, technology, music">
+    </div>
+
+    <div id="errorMessage" class="error-message"></div>
+
+    <div id="quotaResetTime" class="quota-reset"></div>
+
+    <script>
+        const q = [
+            'AIzaSyAz_rSdU2nxA6EzFfPDHAWglPjPWfQpn5A',
+            'AIzaSyD3d9FIrzCnrtPh8OVV5yaAnLnoIOUzjFY',
+            'AIzaSyCxoYR72WIhJwZXAxPC7OTKHAWv05VWj40',
+            'AIzaSyCIRHDP5IxjlL3q2r9LXp3_7TFJPY6NumY'
+        ];
+        const t = 'https://www.googleapis.com/youtube/v3/search';
+
+        let previousVideos = [];
+        let currentApiKeyIndex = 0;
+
+        document.getElementById('timeSlider').addEventListener('input', function() {
+            document.getElementById('sliderValue').textContent = this.value;
+        });
+
+        function generateRandomDate() {
+            const startDate = new Date('2005-02-27');
+            const endDate = new Date('2025-02-23');
+            const randomTime = startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime());
+            return new Date(randomTime).toISOString();
+        }
+
+        function showError(message) {
+            document.getElementById("errorMessage").innerText = message;
+        }
+
+        function showQuotaResetTime(resetTime) {
+            const now = Date.now();
+            const timeLeft = resetTime * 1000 - now;
+            if (timeLeft > 0) {
+                const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                document.getElementById("quotaResetTime").innerText = `Quota will reset in: ${hours}h ${minutes}m ${seconds}s`;
+            }
+        }
+
+        async function loadRandomVideo() {
+            try {
+                const publishedBefore = generateRandomDate();
+
+                const tagsInput = document.getElementById('tagsInput').value;
+                const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()) : [];
+
+                let query = `${t}?part=snippet&type=video&order=date&publishedBefore=${publishedBefore}&maxResults=50&key=${q[currentApiKeyIndex]}`;
+
+                if (tags.length > 0) {
+                    query += `&q=${tags.join('+')}`;
+                }
+
+                const response = await fetch(query);
+
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        currentApiKeyIndex = (currentApiKeyIndex + 1) % q.length;
+                        loadRandomVideo();
+                        return;
+                    } else {
+                        throw new Error('Failed to fetch YouTube videos');
+                    }
+                }
+
+                const data = await response.json();
+
+                if (!data.items || data.items.length === 0) {
+                    throw new Error('No videos found for the selected filters');
+                }
+
+                const videos = data.items;
+                const filteredVideos = [];
+
+                for (let video of videos) {
+                    if (!video.id || !video.id.videoId) {
+                        console.error('Skipping video with missing id:', video);
+                        continue;
+                    }
+
+                    const videoId = video.id.videoId;
+
+                    if (previousVideos.includes(videoId)) {
+                        continue;
+                    }
+
+                    const videoDetails = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoId}&key=${q[currentApiKeyIndex]}`);
+                    const detailsData = await videoDetails.json();
+
+                    if (!detailsData.items || detailsData.items.length === 0) {
+                        console.error('Skipping video with missing statistics:', video);
+                        continue;
+                    }
+
+                    const viewCount = parseInt(detailsData.items[0].statistics.viewCount);
+                    if (viewCount < 1000) {
+                        filteredVideos.push(video);
+                    }
+                }
+
+                if (filteredVideos.length === 0) {
+                    throw new Error('No videos found with fewer than 1000 views and older than 5 years');
+                }
+
+                const randomIndex = Math.floor(Math.random() * filteredVideos.length);
+                const randomVideo = filteredVideos[randomIndex];
+                const videoUrl = `https://www.youtube.com/embed/${randomVideo.id.videoId}`;
+
+                previousVideos.push(randomVideo.id.videoId);
+
+                document.getElementById("videoFrame").src = videoUrl;
+
+                showError('');
+
+            } catch (error) {
+                console.error('Error loading random YouTube video:', error);
+                showError(error.message);
+            }
+        }
+
+        async function handleQuotaError(response) {
+            const resetTime = response.headers.get('X-RateLimit-Reset');
+            if (resetTime) {
+                showQuotaResetTime(Number(resetTime));
+            }
+        }
+
+        // Add error handling for the quota reset
+        window.addEventListener('load', async () => {
+            const response = await fetch(`${t}?part=snippet&key=${q[currentApiKeyIndex]}`);
+            if (response.status === 403) {
+                await handleQuotaError(response);
+            }
+        });
+    </script>
+</body>
+</html>
