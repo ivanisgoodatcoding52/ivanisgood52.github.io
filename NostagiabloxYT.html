@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ObscureYT - Roblox Edition</title>
+    <style>
+        body {
+            font-family: Verdana, sans-serif;
+            background-color: #1A1A1A;
+            color: white;
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: bold;
+            background-color: #232323;
+            padding: 10px;
+            border-bottom: 2px solid #444;
+        }
+        iframe {
+            width: 640px;
+            height: 360px;
+            border: 3px solid #666;
+            background-color: black;
+        }
+        button {
+            background-color: #4B4B4B;
+            border: 1px solid #888;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+        button:hover {
+            background-color: #666;
+        }
+        input, label {
+            font-size: 14px;
+            background-color: #333;
+            color: white;
+            border: 1px solid #555;
+            padding: 5px;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .quota-reset {
+            font-size: 12px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>ObscurebloxYT</h1>
+    <h4>Discover Hidden Roblox Videos</h4>
+    <iframe id="videoFrame" src="" allowfullscreen></iframe>
+    <br>
+    <button onclick="loadRandomVideo()">Load Random Video</button>
+
+    <div>
+        <label for="datePicker">Select Date:</label>
+        <input type="date" id="datePicker" min="2006-01-01" max="2020-12-31" value="2020-12-31">
+    </div>
+
+    <div>
+        <label for="tagsInput">Enter Tags:</label>
+        <input type="text" id="tagsInput" placeholder="e.g., obby, tycoon">
+    </div>
+
+    <div id="errorMessage" class="error-message"></div>
+    <div id="quotaResetTime" class="quota-reset"></div>
+
+    <script>
+        const q = [
+            'AIzaSyAz_rSdU2nxA6EzFfPDHAWglPjPWfQpn5A',
+            'AIzaSyD3d9FIrzCnrtPh8OVV5yaAnLnoIOUzjFY',
+            'AIzaSyCxoYR72WIhJwZXAxPC7OTKHAWv05VWj40',
+            'AIzaSyCIRHDP5IxjlL3q2r9LXp3_7TFJPY6NumY',
+            'AIzaSyDokI4VAgm_s5jxMrPsFG4d9u6GfTWmeT4'
+        ];
+        const t = 'https://www.googleapis.com/youtube/v3/search';
+        let previousVideos = [];
+        let currentApiKeyIndex = 0;
+
+        function showError(message) {
+            document.getElementById("errorMessage").innerText = message;
+        }
+
+        async function loadRandomVideo() {
+            try {
+                const selectedDate = document.getElementById('datePicker').value;
+                const publishedAfter = `${selectedDate}T00:00:00Z`;
+                const publishedBefore = `${selectedDate}T23:59:59Z`;
+                const tagsInput = document.getElementById('tagsInput').value.trim();
+                const tags = tagsInput ? `Roblox ${tagsInput.replace(/,\s*/g, ' Roblox ')}` : 'Roblox';
+
+                let query = `${t}?part=snippet&type=video&order=date&publishedAfter=${publishedAfter}&publishedBefore=${publishedBefore}&q=${encodeURIComponent(tags)}&maxResults=50&key=${q[currentApiKeyIndex]}`;
+
+                const response = await fetch(query);
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        currentApiKeyIndex = (currentApiKeyIndex + 1) % q.length;
+                        loadRandomVideo();
+                        return;
+                    } else {
+                        throw new Error('Failed to fetch YouTube videos');
+                    }
+                }
+
+                const data = await response.json();
+                if (!data.items || data.items.length === 0) {
+                    throw new Error('No videos found for the selected filters');
+                }
+
+                const filteredVideos = [];
+                for (const video of data.items) {
+                    const videoId = video.id.videoId;
+                    const videoDetails = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet&id=${videoId}&key=${q[currentApiKeyIndex]}`);
+                    const detailsData = await videoDetails.json();
+
+                    if (!detailsData.items || detailsData.items.length === 0) continue;
+
+                    const stats = detailsData.items[0].statistics;
+                    const channelId = detailsData.items[0].snippet.channelId;
+
+                    const channelDetails = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelId}&key=${q[currentApiKeyIndex]}`);
+                    const channelData = await channelDetails.json();
+
+                    if (!channelData.items || channelData.items.length === 0) continue;
+
+                    const subscribers = parseInt(channelData.items[0].statistics.subscriberCount, 10);
+                    const views = parseInt(stats.viewCount, 10);
+
+                    if (views <= 10000 && subscribers >= 1000) {
+                        filteredVideos.push(video);
+                    }
+                }
+
+                if (filteredVideos.length === 0) {
+                    throw new Error('No videos found with 10,000 views or less and channels with at least 1,000 subscribers');
+                }
+
+                const randomIndex = Math.floor(Math.random() * filteredVideos.length);
+                const randomVideo = filteredVideos[randomIndex];
+                const videoUrl = `https://www.youtube.com/embed/${randomVideo.id.videoId}`;
+                previousVideos.push(randomVideo.id.videoId);
+                document.getElementById("videoFrame").src = videoUrl;
+                showError('');
+            } catch (error) {
+                console.error('Error loading random YouTube video:', error);
+                showError(error.message);
+            }
+        }
+    </script>
+</body>
+</html>
