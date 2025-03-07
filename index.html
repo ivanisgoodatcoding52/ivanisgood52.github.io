@@ -3,220 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Cool Webpage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Reset and Base Styling */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Courier New", Courier, monospace;
         }
         body {
-            background-color: #000;
-            color: #0f0;
+            background-color: black;
+            color: white;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            max-width: 100%;
-            text-align: left;
-        }
-
-        /* Navigation Bar */
-        nav {
-            width: 100%;
-            background-color: #000;
-            padding: 10px;
-            border-bottom: 2px solid #0f0;
-            text-align: center;
-        }
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 20px;
             justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            font-family: Arial, sans-serif; /* Changed to Arial */
         }
-        nav ul li a {
-            color: #0f0;
-            text-decoration: none;
-            padding: 5px 10px;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
-        nav ul li a:hover {
-            color: #33ff33;
-        }
-
-        /* Hero Section */
-        #hero {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #111;
-            border: 1px solid #0f0;
-            width: 90%;
-            max-width: 800px;
-            border-radius: 5px;
-        }
-        #hero h1, #hero p {
-            margin-bottom: 10px;
-        }
-        .button {
-            display: inline-block;
-            background-color: #0f0;
-            color: #000;
-            padding: 8px 20px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-top: 10px;
-            transition: background 0.3s;
-        }
-        .button:hover {
-            background-color: #33ff33;
-        }
-
-        /* Project Section */
-        #projects {
-            margin-top: 30px;
-            width: 90%;
-            max-width: 800px;
-        }
-        #projects h2 {
-            font-size: 1.8rem;
-            color: #0f0;
-            margin-bottom: 15px;
-        }
-        .card {
-            background-color: #111;
-            padding: 15px;
-            border: 1px solid #0f0;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        .card:hover {
-            background-color: #222;
-        }
-        .card h3 {
-            color: #33ff33;
-            margin-bottom: 10px;
-        }
-        .card p, .card a {
-            color: #0f0;
-        }
-        .card img {
+        .static {
+            position: absolute;
             width: 100%;
-            height: auto;
-            border: 1px solid #0f0;
-            margin-top: 10px;
+            height: 100%;
+            background: url('https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcngwaDI0enZpY2pwb3RhNGhhMjZsajd5bzcwYnBncG8zcnFmdHc2ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/QuPrp3BI6cMe2lErCb/giphy.gif');
+            opacity: 0.6;
+            pointer-events: none;
         }
-        .card a {
-            display: inline-block;
-            padding: 5px 10px;
-            color: #0f0;
-            border-radius: 4px;
-            margin-top: 10px;
+        .logo {
+            font-size: 3rem;
             font-weight: bold;
+            margin-bottom: 20px;
+            z-index: 1;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+            z-index: 1;
+        }
+        .social-links a {
+            color: white;
             text-decoration: none;
+            font-size: 1.5rem;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
         }
-        .card a:hover {
-            color: #33ff33;
-        }
-
-        /* About Section */
-        #about, #pisst {
-            margin-top: 30px;
-            width: 90%;
-            max-width: 800px;
-            background-color: #111;
-            padding: 15px;
-            border: 1px solid #0f0;
+        .social-links a span {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
             border-radius: 5px;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: opacity 0.3s ease-in-out;
         }
-        #about h2, #pisst h2 {
-            color: #0f0;
-            font-size: 1.8rem;
-            margin-bottom: 15px;
+        .social-links a:hover span {
+            visibility: visible;
+            opacity: 1;
+            transition-delay: 2s;
         }
-        #about p, #pisst p {
-            color: #0f0;
-            line-height: 1.5;
+        .social-links img {
+            width: 30px;
+            height: 30px;
         }
-        #about a, #pisst a {
-            color: #33ff33;
-            text-decoration: underline;
+        .additional-links {
+            position: absolute;
+            bottom: 20px; /* Positioned at the bottom */
+            display: flex;
+            gap: 30px;
+            font-size: 1.5rem;
+            z-index: 1;
+            font-family: Arial, sans-serif; /* Use Arial for the new links */
         }
-
-        /* Mobile Adjustments */
-        @media (max-width: 768px) {
-            #hero, #projects, #about, #pisst {
-                width: 100%;
-            }
-            #hero h1 {
-                font-size: 1.6rem;
-            }
-            #projects h2,
-            #about h2 {
-                font-size: 1.4rem;
-            }
+        .additional-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease-in-out;
+        }
+        .additional-links a:hover {
+            color: #ff6347; /* Change color on hover */
         }
     </style>
 </head>
 <body>
-
-    <header>
-        <nav>
-            <ul>
-                <li><a href="#hero">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#projects">Projects</a></li>
-                <li><a href="https://ivanisgood52.neocities.org/Academics">Academics</a></li>
-                <li><a href="https://ivanisgood52.neocities.org/ARchive">Archive</a></li>
-                <li><a href="https://ivanisgood52.neocities.org/aboutme">Further About Me</a></li>
-                <li><a href="sigma.html">Roblox Launchers</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <section id="hero">
-        <h1>Welcome to ARRAY / @ivanisgood52's</h1>
-        <p>Explore my projects and creative work over the years.</p>
-        <a href="#projects" class="button">View Projects</a>
-    </section>
-    
-    <section id="about">
-        <h2>About Me</h2>
-        <p>Hello! I’m a creator focusing on games, web development, and applications. This site is my project showcase. For more information, check these links: 
-            <a href="https://ivanisgood52.neocities.org/aboutme">About Me</a>, <a href="https://ivanisgood52.neocities.org/Academics">Academics</a>
-        </p>
-    </section>
-
-    <section id="projects">
-        <h2>Projects</h2>
-        <div class="card">
-            <h3>Aphierophobia</h3>
-            <img src="ap.png" alt="Aphierophobia">
-            <p>You wake up in a mysterious, endless furniture department store. <b>Survive. Build. Fight.</b></p>
-            <a href="https://www.youtube.com/channel/UCDTF3nX_CMW1lFT2kyVUs2Q">Devlog</a>
-            <a href="https://ivanisgood52.itch.io/apeirophobia-11">itch.io page</a>
-        </div>
-        <div class="card">
-            <h3>Deluge</h3>
-            <p>A virtual world with rising floods. How long can you escape?</p>
-            <a href="#">IN DEVELOPMENT (NOT AVAILABLE)</a>
-        </div>
-        <div class="card">
-            <h3>Dragon Battlegrounds</h3>
-            <p>A Roblox fighting game in collaboration with @oka, @toyfreddy, and @NonyCake.</p>
-            <img src="https://ivanisgood52.neocities.org/Screenshot%202024-10-26%20225040.png" alt="Dragon Battlegrounds">
-            <a href="#">IN DEVELOPMENT (NOT AVAILABLE)</a>
-        </div>
-    </section>
-    
-    <section id="pisst">
-        <p>Looking for the "Old Website"? Find it <a href="https://ivanisgood52.neocities.org/android">here</a>.</p>
-    </section>
-
+    <div class="static"></div>
+    <div class="logo">
+        <img src="logo.png" alt="Logo">
+    </div>
+    <div class="social-links">
+        <a href="https://x.com/unnameduserplus"><img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter"><span>Twitter</span></a>
+        <a href="https://www.youtube.com/@ivanisdeveloper-hs9ez"><img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube"><span>YouTube</span></a>
+        <a href="https://github.com/ivanisgoodatcoding52"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111432.png" alt="GitHub"><span>GitHub</span></a>
+    </div>
+    <div class="additional-links">
+        <a href="#">Blog</a>
+        <a href="#">Projects</a>
+        <a href="#">Languages</a>
+    </div>
 </body>
 </html>
