@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Languages I Know</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://khang-nd.github.io/7.css/7.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: black;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        .static {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcngwaDI0enZpY2pwb3RhNGhhMjZsajd5bzcwYnBncG8zcnFmdHc2ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/QuPrp3BI6cMe2lErCb/giphy.gif');
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            z-index: 1;
+        }
+        .navigation-links {
+            display: flex;
+            gap: 30px;
+            z-index: 1;
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+        .navigation-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease-in-out;
+        }
+        .navigation-links a:hover {
+            color: #ff6347;
+        }
+        .timeline {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 1000px;
+            gap: 40px;
+            margin-top: 20px;
+        }
+        .timeline-item {
+            text-align: center;
+            z-index: 1;
+            cursor: pointer;
+            position: relative;
+        }
+        .timeline-item .year {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background-color: #444;
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+            min-width: 100px;
+            text-align: center;
+            transition: background-color 0.3s, transform 0.2s ease-in-out;
+        }
+        .timeline-item .year:hover {
+            background-color: #666;
+            transform: scale(1.1);
+        }
+        .timeline-item .description {
+            margin-top: 10px;
+            font-size: 1rem;
+            color: #ccc;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+            width: 250px;
+            text-align: center;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, opacity 0.5s ease-in-out, padding 0.5s ease;
+        }
+        .timeline-item.open .description {
+            opacity: 1;
+            max-height: 200px;
+            padding: 15px;
+        }
+        .timeline-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="static"></div>
+    <div class="logo">
+        <img src="logo.png" alt="Logo">
+    </div>
+    <div class="navigation-links">
+        <a href="index.html">Home</a>
+        <a href="languages.html">Languages</a>
+        <a href="blog.html">Blog</a>
+    </div>
+    <div class="timeline-container">
+        <div class="timeline">
+          <div class="timeline-item" onclick="toggleDescription(this)">
+              <div class="year">2018</div>
+              <div class="description">Scratch: Practically every single kid's first coding language, used to be the blueprint for bigger projects.</div>
+          </div>
+            <div class="timeline-item" onclick="toggleDescription(this)">
+                <div class="year">2019</div>
+                <div class="description">Scratch & Python: More of the last one, barely used Python at all.</div>
+            </div>
+            <div class="timeline-item" onclick="toggleDescription(this)">
+                <div class="year">2020</div>
+                <div class="description">Python & HTML: Slightly more advanced Python scripts, started to make basic webpages</div>
+            </div>
+            <div class="timeline-item" onclick="toggleDescription(this)">
+                <div class="year">2021</div>
+                <div class="description">HTML, CSS, JS, Python, C++: First 3 are key details in my future website making journey, Python as a more algorethemic apporach, and C++ for simple efficiency</div>
+            </div>
+            <div class="timeline-item" onclick="toggleDescription(this)">
+                <div class="year">2022</div>
+                <div class="description">Python and Ruby: the backend duo for websites</div>
+            </div>
+            <div class="timeline-item" onclick="toggleDescription(this)">
+                <div class="year">2023</div>
+                <div class="description">C#, Java, Python: C# for unity games, Java for simple applications, and Python for AI enhancement, etc. </div>
+            </div>
+            <div class="timeline-item" onclick="toggleDescription(this)">
+                <div class="year">2024</div>
+                <div class="description">Python, C, .net: Python for more AI enhancement, C and .net for advanced application programming.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleDescription(element) {
+            element.classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
