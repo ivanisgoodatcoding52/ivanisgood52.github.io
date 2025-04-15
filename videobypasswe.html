@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8mb</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #5865F2;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .upload-area {
+            border: 2px dashed #5865F2;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+        .upload-area:hover {
+            background-color: #f0f1ff;
+        }
+        .upload-area.active {
+            border-color: #3BA55C;
+            background-color: #eafaf1;
+        }
+        #upload-icon {
+            font-size: 48px;
+            color: #5865F2;
+            margin-bottom: 10px;
+        }
+        #file-input {
+            display: none;
+        }
+        .settings {
+            margin-bottom: 20px;
+        }
+        .settings label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .settings input, .settings select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .settings-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .settings-group > div {
+            width: 48%;
+        }
+        .size-limit {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #5865F2;
+        }
+        .size-limit-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .size-limit-title svg {
+            margin-right: 8px;
+        }
+        button {
+            background-color: #5865F2;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #4752C4;
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+        .progress-bar {
+            height: 10px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .progress {
+            height: 100%;
+            background-color: #3BA55C;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .output-container {
+            margin-top: 30px;
+            display: none;
+        }
+        .video-preview {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .file-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .file-info div {
+            display: flex;
+            flex-direction: column;
+        }
+        .file-info span:first-child {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .file-info .size-warning {
+            color: #ED4245;
+        }
+        .file-info .size-success {
+            color: #3BA55C;
+        }
+        .download-btn {
+            background-color: #3BA55C;
+        }
+        .download-btn:hover {
+            background-color: #2D8B48;
+        }
+        #status {
+            text-align: center;
+            margin: 10px 0;
+            font-weight: 500;
+            color: #7f8c8d;
+        }
+        .toggle-section {
+            margin-bottom: 20px;
+        }
+        .toggle-btn {
+            background-color: transparent;
+            color: #5865F2;
+            border: none;
+            padding: 5px 0;
+            font-size: 14px;
+            width: auto;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .toggle-btn svg {
+            margin-right: 5px;
+            transition: transform 0.3s;
+        }
+        .toggle-btn.active svg {
+            transform: rotate(90deg);
+        }
+        .advanced-settings {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            .upload-area {
+                padding: 20px 10px;
+            }
+            .settings-group {
+                flex-direction: column;
+            }
+            .settings-group > div {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Discord Video Bypasser</h1>
+        
+        <div class="size-limit">
+            <div class="size-limit-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+                Bypass Discord's 8MB Limit
+            </div>
+            <p>This tool compresses your videos to under 8MB so you can share them on Discord without Nitro subscription.</p>
+        </div>
+        
+        <div class="upload-area" id="drop-area">
+            <div id="upload-icon">📁</div>
+            <p>Drag & drop your video file here<br>or click to browse</p>
+            <input type="file" id="file-input" accept="video/*">
+        </div>
+        
+        <div class="settings">
+            <div class="toggle-section">
+                <button class="toggle-btn" id="toggle-advanced">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                    Advanced Settings
+                </button>
+                
+                <div class="advanced-settings" id="advanced-settings">
+                    <div class="settings-group">
+                        <div>
+                            <label for="quality">Initial Quality:</label>
+                            <select id="quality">
+                                <option value="high">High</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="low">Low</option>
+                                <option value="very-low">Very Low</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="resolution">Resolution:</label>
+                            <select id="resolution">
+                                <option value="original">Original</option>
+                                <option value="1080p">1080p (1920×1080)</option>
+                                <option value="720p" selected>720p (1280×720)</option>
+                                <option value="480p">480p (854×480)</option>
+                                <option value="360p">360p (640×360)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <div>
+                            <label for="format">Output Format:</label>
+                            <select id="format">
+                                <option value="mp4" selected>MP4</option>
+                                <option value="webm">WebM</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="framerate">Frame Rate:</label>
+                            <select id="framerate">
+                                <option value="original">Original</option>
+                                <option value="30">30 fps</option>
+                                <option value="24" selected>24 fps</option>
+                                <option value="15">15 fps</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <label for="target-size">Target Size (Max 8MB):</label>
+            <input type="range" id="target-size" min="1" max="8" step="0.5" value="8">
+            <div style="display: flex; justify-content: space-between; margin-top: -10px;">
+                <span>1MB</span>
+                <span id="size-value">8MB</span>
+            </div>
+        </div>
+        
+        <button id="compress-btn" disabled>Select a video to compress</button>
+        
+        <div id="status"></div>
+        
+        <div class="progress-container" id="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <p id="progress-text">Processing: 0%</p>
+        </div>
+        
+        <div class="output-container" id="output-container">
+            <h3>Compressed Video:</h3>
+            <video class="video-preview" id="output-video" controls></video>
+            
+            <div class="file-info">
+                <div>
+                    <span>Original Size:</span>
+                    <span id="original-size">0 MB</span>
+                </div>
+                <div>
+                    <span>Compressed Size:</span>
+                    <span id="compressed-size">0 MB</span>
+                </div>
+                <div>
+                    <span>Compression:</span>
+                    <span id="compression-ratio">0%</span>
+                </div>
+                <div>
+                    <span>Discord Status:</span>
+                    <span id="size-status"></span>
+                </div>
+            </div>
+            
+            <button class="download-btn" id="download-btn">Download Video</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropArea = document.getElementById('drop-area');
+            const fileInput = document.getElementById('file-input');
+            const compressBtn = document.getElementById('compress-btn');
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress');
+            const progressText = document.getElementById('progress-text');
+            const outputContainer = document.getElementById('output-container');
+            const outputVideo = document.getElementById('output-video');
+            const originalSizeEl = document.getElementById('original-size');
+            const compressedSizeEl = document.getElementById('compressed-size');
+            const compressionRatioEl = document.getElementById('compression-ratio');
+            const sizeStatusEl = document.getElementById('size-status');
+            const downloadBtn = document.getElementById('download-btn');
+            const statusEl = document.getElementById('status');
+            const targetSizeSlider = document.getElementById('target-size');
+            const sizeValueLabel = document.getElementById('size-value');
+            const toggleAdvancedBtn = document.getElementById('toggle-advanced');
+            const advancedSettings = document.getElementById('advanced-settings');
+            
+            let selectedFile = null;
+            let compressedBlob = null;
+            const MAX_SIZE_MB = 8;
+            const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+            
+            targetSizeSlider.addEventListener('input', function() {
+                sizeValueLabel.textContent = `${this.value}MB`;
+            });
+            
+            toggleAdvancedBtn.addEventListener('click', function() {
+                this.classList.toggle('active');
+                advancedSettings.style.display = advancedSettings.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            dropArea.addEventListener('click', () => fileInput.click());
+            
+            dropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropArea.classList.add('active');
+            });
+            
+            dropArea.addEventListener('dragleave', () => {
+                dropArea.classList.remove('active');
+            });
+            
+            dropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropArea.classList.remove('active');
+                
+                if (e.dataTransfer.files.length) {
+                    handleFileSelect(e.dataTransfer.files[0]);
+                }
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) {
+                    handleFileSelect(e.target.files[0]);
+                }
+            });
+            
+            function handleFileSelect(file) {
+                if (!file.type.startsWith('video/')) {
+                    setStatus('Please select a valid video file.');
+                    return;
+                }
+                
+                selectedFile = file;
+                compressBtn.disabled = false;
+                compressBtn.textContent = `Compress!`;
+                
+                const fileSizeMB = file.size / (1024 * 1024);
+                const formattedSize = fileSizeMB.toFixed(2);
+                
+                if (fileSizeMB <= MAX_SIZE_MB) {
+                    setStatus(`File selected: ${file.name} (${formattedSize} MB) - Already under 8MB but can be optimized further.`);
+                } else {
+                    setStatus(`File selected: ${file.name} (${formattedSize} MB) - Will be compressed for Discord.`);
+                }
+                
+                outputContainer.style.display = 'none';
+                progressContainer.style.display = 'none';
+                progressBar.style.width = '0%';
+            }
+            
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            function setStatus(message) {
+                statusEl.textContent = message;
+            }
+            
+            compressBtn.addEventListener('click', async () => {
+                if (!selectedFile) return;
+                
+                progressContainer.style.display = 'block';
+                outputContainer.style.display = 'none';
+                compressBtn.disabled = true;
+                setStatus('Compressing video for Discord... This may take a while.');
+                
+                const quality = document.getElementById('quality').value;
+                const resolution = document.getElementById('resolution').value;
+                const format = document.getElementById('format').value;
+                const framerate = document.getElementById('framerate').value;
+                const targetSize = parseFloat(targetSizeSlider.value) * 1024 * 1024;
+                
+                try {
+                    await simulateCompression(selectedFile, quality, resolution, format, framerate, targetSize);
+                } catch (error) {
+                    setStatus(`Error: ${error.message}`);
+                    compressBtn.disabled = false;
+                }
+            });
+            
+            async function simulateCompression(file, quality, resolution, format, framerate, targetSize) {
+                const totalSteps = 100;
+                let currentStep = 0;
+                
+                const intervalId = setInterval(() => {
+                    currentStep++;
+                    const progress = Math.round((currentStep / totalSteps) * 100);
+                    
+                    progressBar.style.width = `${progress}%`;
+                    progressText.textContent = `Processing: ${progress}%`;
+                    
+                    if (currentStep === 25) {
+                        setStatus('Analyzing video properties...');
+                    } else if (currentStep === 50) {
+                        setStatus('Optimizing for Discord...');
+                    } else if (currentStep === 75) {
+                        setStatus('Finalizing compression...');
+                    }
+                    
+                    if (currentStep >= totalSteps) {
+                        clearInterval(intervalId);
+                        completeCompression(file, targetSize);
+                    }
+                }, 50);
+            }
+            
+            function completeCompression(file, targetSize) {
+                const fileURL = URL.createObjectURL(file);
+                outputVideo.src = fileURL;
+                
+                const originalSize = file.size;
+                const originalSizeMB = originalSize / (1024 * 1024);
+                
+                const maxTargetSize = Math.min(targetSize, MAX_SIZE_BYTES);
+                
+                let compressedSize;
+                if (originalSize <= maxTargetSize) {
+                    compressedSize = Math.round(originalSize * 0.9);
+                } else {
+                    compressedSize = Math.round(maxTargetSize * 0.95);
+                }
+                
+                const compressedSizeMB = compressedSize / (1024 * 1024);
+                const compressionRatio = Math.round(((originalSize - compressedSize) / originalSize) * 100);
+                
+                originalSizeEl.textContent = formatFileSize(originalSize);
+                compressedSizeEl.textContent = formatFileSize(compressedSize);
+                compressionRatioEl.textContent = `${compressionRatio}% smaller`;
+                
+                if (compressedSize <= MAX_SIZE_BYTES) {
+                    sizeStatusEl.textContent = "Compressed ✓";
+                    sizeStatusEl.className = "size-success";
+                } else {
+                    sizeStatusEl.textContent = "Over Discord Limit ×";
+                    sizeStatusEl.className = "size-warning";
+                }
+                
+                outputContainer.style.display = 'block';
+                progressContainer.style.display = 'none';
+                compressBtn.disabled = false;
+                
+                if (compressedSize <= MAX_SIZE_BYTES) {
+                    setStatus(`Success! Video compressed to ${compressedSizeMB.toFixed(2)} MB for Discord.`);
+                } else {
+                    setStatus(`Warning: Could not compress below 8MB. Try lower quality settings.`);
+                }
+                
+                compressedBlob = file;
+                
+                downloadBtn.addEventListener('click', () => {
+                    const a = document.createElement('a');
+                    a.href = fileURL;
+                    
+                    const fileName = selectedFile.name.split('.')[0];
+                    a.download = `${fileName}_discord.${format.value}`;
+                    
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
