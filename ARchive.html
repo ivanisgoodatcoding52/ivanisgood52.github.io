@@ -14,7 +14,6 @@
             display: flex;
         }
 
-        /* Sidebar styling */
         .sidebar {
             width: 250px;
             background-color: #333;
@@ -98,13 +97,11 @@
             text-decoration: underline;
         }
 
-        /* Hidden by default, visible when selected */
         .file-list { display: none; }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar Section -->
     <div class="sidebar">
         <h2>File Archive Paths</h2>
         <ul>
@@ -115,12 +112,10 @@
         </ul>
     </div>
 
-    <!-- Main Content Section -->
     <div class="content">
         <h1>File Archive</h1>
         <h4>Basically where I dump all of my files I want to dump. Can range to roblox games to raw video footage.</h4>
 
-        <!-- Root Directory -->
         <div id="root" class="file-list">
             <h2>Root Directory</h2>
             <div class="file-item">
@@ -134,7 +129,6 @@
             </div>
         </div>
 
-        <!-- Raw Footage Directory -->
         <div id="rawfootage" class="file-list">
             <h2>Raw Footage Files</h2>
             <div class="file-item">
@@ -151,7 +145,6 @@
             </div>
         </div>
 
-        <!-- Raw Footage Subfolder -->
         <div id="ROBLOX" class="file-list">
             <h2>Roblox</h2>
             <div class="file-item">
@@ -217,45 +210,14 @@
             </div>
         </div>
 
-        <!-- Scripts Directory -->
-        <div id="scripts" class="file-list">
-            <h2>Scripts</h2>
-            <div class="file-item">
-                <span>📄 Script1.js</span>
-                <a href="files/scripts/Script1.js" download>Download</a>
-            </div>
-            <div class="file-item">
-                <span>📄 Script2.py</span>
-                <a href="files/scripts/Script2.py" download>Download</a>
-            </div>
-        </div>
-
-        <!-- Subdirectory 2 -->
-        <div id="subdir2" class="file-list">
-            <h2>Subdirectory 2 Files</h2>
-            <div class="file-item">
-                <span>📄 Subfile2.txt</span>
-                <a href="files/Subdir2/Subfile2.txt" download>Download</a>
-            </div>
-            <div class="file-item">
-                <span>📄 AnotherDocument.pdf</span>
-                <a href="files/Subdir2/AnotherDocument.pdf" download>Download</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- JavaScript to Toggle Visibility -->
     <script>
         function showDirectory(directory) {
-            // Hide all file-list sections
             const directories = document.querySelectorAll('.file-list');
             directories.forEach(dir => dir.style.display = 'none');
 
-            // Show the selected directory
             document.getElementById(directory).style.display = 'block';
         }
 
-        // Show the root directory by default
         showDirectory('root');
     </script>
 
