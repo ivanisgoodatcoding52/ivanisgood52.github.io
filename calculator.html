@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Admissions Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #999;
+            font-size: 1.1em;
+        }
+
+        .card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+        }
+
+        .card-header {
+            background: #000;
+            padding: 25px;
+            border-bottom: 1px solid #333;
+        }
+
+        .card-header p {
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .card-header h2 {
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #ddd;
+            font-size: 0.95em;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            background: #252525;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1em;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #666;
+            background: #2a2a2a;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-full {
+            grid-column: 1 / -1;
+        }
+
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .item-entry {
+            background: #252525;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #444;
+        }
+
+        .item-header h4 {
+            font-size: 0.95em;
+            color: #ccc;
+        }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.2s;
+        }
+
+        .btn-delete:hover {
+            color: #ff4444;
+        }
+
+        .item-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .item-field-full {
+            grid-column: 1 / -1;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            color: #ddd;
+        }
+
+        .btn-add {
+            width: 100%;
+            padding: 12px;
+            background: #2a2a2a;
+            border: 2px dashed #555;
+            color: #999;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-add:hover {
+            border-color: #777;
+            color: #ccc;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .buttons.single {
+            grid-template-columns: 1fr;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary {
+            background: #333;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #444;
+        }
+
+        .btn-primary {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: #ddd;
+        }
+
+        .btn-success {
+            background: #222;
+            color: #fff;
+            border: 1px solid #555;
+        }
+
+        .btn-success:hover {
+            background: #333;
+            border-color: #777;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .progress-step {
+            flex: 1;
+            height: 3px;
+            background: #444;
+            border-radius: 2px;
+        }
+
+        .progress-step.active {
+            background: #fff;
+        }
+
+        .progress-step.complete {
+            background: #666;
+        }
+
+        /* Report Styles */
+        .report-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .score-box {
+            background: #252525;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .score-label {
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .score-value {
+            font-size: 3.5em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .score-unit {
+            color: #666;
+            font-size: 0.8em;
+        }
+
+        .breakdown-item {
+            margin-bottom: 20px;
+        }
+
+        .breakdown-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .breakdown-bar {
+            width: 100%;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .breakdown-fill {
+            height: 100%;
+            background: #888;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .improvement-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .improvement-item {
+            background: #252525;
+            border-left: 3px solid #666;
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        .improvement-priority-1 {
+            border-left-color: #888;
+        }
+
+        .improvement-priority-2 {
+            border-left-color: #666;
+        }
+
+        .improvement-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .priority-badge {
+            width: 28px;
+            height: 28px;
+            background: #555;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .improvement-category {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .improvement-action {
+            color: #bbb;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .improvement-detail {
+            color: #888;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+
+        .improvement-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .lift-badge {
+            background: #333;
+            padding: 4px 10px;
+            border-radius: 4px;
+            color: #aaa;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .back-button {
+            margin-bottom: 20px;
+        }
+
+        .report-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .report-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .report-container {
+                grid-template-columns: 1fr;
+            }
+
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-bar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="calculator" class="calculator-view">
+            <div class="progress-bar" id="progressBar"></div>
+
+            <div class="card">
+                <div class="card-header">
+                    <p id="stepCounter"></p>
+                    <h2 id="stepTitle"></h2>
+                </div>
+
+                <div class="card-body" id="stepContent"></div>
+
+                <div style="padding: 0 30px 30px 30px;">
+                    <div class="buttons" id="buttons"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="report" class="hidden">
+            <button class="btn btn-secondary back-button" onclick="app.showCalculator()">← Back to Calculator</button>
+            
+            <div class="report-container">
+                <div id="reportSidebar"></div>
+                <div id="reportMain"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const app = {
+            currentStep: 0,
+            profile: {
+                name: '',
+                targetSchool: 'Stanford',
+                unweightedGPA: '',
+                gpaScale: '4.0',
+                weightedGPA: '',
+                satComposite: '',
+                actComposite: '',
+                classRank: '',
+                classSize: '',
+                apCourses: [{ name: '', score: '', yearTaken: 2024 }],
+                courses: [{ name: '', level: 'regular', grade: 'A' }],
+                extracurriculars: [{ name: '', role: '', years: 1, hoursPerWeek: 5, level: 'school', leadership: false }],
+                sports: [{ name: '', level: 'varsity', yearsPlayed: 1, position: '', recruited: false }],
+                projects: [{ name: '', type: 'personal', impactScore: 5, githubUrl: '', stars: 0 }],
+                research: [{ name: '', field: '', mentor: '', institution: '', durationMonths: 3, publications: 0, conferences: 0 }],
+                awards: [{ name: '', level: 'school', year: 2024 }],
+                essay: 70,
+                teacherRec1: 'average',
+                teacherRec2: 'average',
+                counselorRec: 'average',
+                firstGen: false,
+                urm: false,
+                legacy: false,
+                lowIncome: false,
+                international: false,
+            },
+            report: null,
+            schedule: null,
+
+            steps: [
+                'Basic Info',
+                'Core Academics',
+                'Courses',
+                'AP/IB Tests',
+                'Extracurriculars',
+                'Sports',
+                'Projects',
+                'Research',
+                'Awards',
+                'Essays & Recs',
+                'Demographics',
+            ],
+
+            init() {
+                this.renderStep();
+                this.updateProgressBar();
+            },
+
+            renderStep() {
+                const stepContent = document.getElementById('stepContent');
+                const stepCounter = document.getElementById('stepCounter');
+                const stepTitle = document.getElementById('stepTitle');
+                const buttons = document.getElementById('buttons');
+
+                stepCounter.textContent = `Step ${this.currentStep + 1} of ${this.steps.length}`;
+                stepTitle.textContent = this.steps[this.currentStep];
+
+                stepContent.innerHTML = '';
+
+                switch(this.currentStep) {
+                    case 0: this.renderBasicInfo(stepContent); break;
+                    case 1: this.renderCoreAcademics(stepContent); break;
+                    case 2: this.renderItemList(stepContent, 'courses', [
+                        { key: 'name', label: 'Course Name', full: true },
+                        { key: 'level', label: 'Level', type: 'select', options: ['regular', 'honors', 'AP', 'IB', 'DE'] },
+                        { key: 'grade', label: 'Grade', type: 'select', options: ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C'] },
+                    ]); break;
+                    case 3: this.renderItemList(stepContent, 'apCourses', [
+                        { key: 'name', label: 'AP/IB Course', full: true },
+                        { key: 'score', label: 'Score (1-5)', type: 'number' },
+                        { key: 'yearTaken', label: 'Year', type: 'number' },
+                    ]); break;
+                    case 4: this.renderItemList(stepContent, 'extracurriculars', [
+                        { key: 'name', label: 'Activity Name', full: true },
+                        { key: 'role', label: 'Your Role', full: true },
+                        { key: 'years', label: 'Years', type: 'number' },
+                        { key: 'hoursPerWeek', label: 'Hours/Week', type: 'number' },
+                        { key: 'level', label: 'Scope', type: 'select', options: ['school', 'city', 'state', 'national', 'international'] },
+                        { key: 'leadership', label: 'Leadership Role?', type: 'checkbox' },
+                    ]); break;
+                    case 5: this.renderItemList(stepContent, 'sports', [
+                        { key: 'name', label: 'Sport', full: true },
+                        { key: 'level', label: 'Level', type: 'select', options: ['varsity', 'JV', 'club'] },
+                        { key: 'yearsPlayed', label: 'Years', type: 'number' },
+                        { key: 'position', label: 'Position', full: true },
+                        { key: 'recruited', label: 'D1/D3 Recruited?', type: 'checkbox' },
+                    ]); break;
+                    case 6: this.renderItemList(stepContent, 'projects', [
+                        { key: 'name', label: 'Project Name', full: true },
+                        { key: 'type', label: 'Type', type: 'select', options: ['personal', 'hackathon', 'research', 'open-source'] },
+                        { key: 'impactScore', label: 'Impact (0-10)', type: 'number' },
+                        { key: 'githubUrl', label: 'GitHub URL', full: true },
+                        { key: 'stars', label: 'GitHub Stars', type: 'number' },
+                    ]); break;
+                    case 7: this.renderItemList(stepContent, 'research', [
+                        { key: 'name', label: 'Research Title', full: true },
+                        { key: 'field', label: 'Field', full: true },
+                        { key: 'mentor', label: 'Mentor/PI', full: true },
+                        { key: 'institution', label: 'Institution', full: true },
+                        { key: 'durationMonths', label: 'Duration (months)', type: 'number' },
+                        { key: 'publications', label: 'Publications', type: 'number' },
+                        { key: 'conferences', label: 'Conferences', type: 'number' },
+                    ]); break;
+                    case 8: this.renderItemList(stepContent, 'awards', [
+                        { key: 'name', label: 'Award Name', full: true },
+                        { key: 'level', label: 'Level', type: 'select', options: ['school', 'state', 'national', 'international'] },
+                        { key: 'year', label: 'Year', type: 'number' },
+                    ]); break;
+                    case 9: this.renderEssaysAndRecs(stepContent); break;
+                    case 10: this.renderDemographics(stepContent); break;
+                }
+
+                this.renderButtons(buttons);
+            },
+
+            renderBasicInfo(container) {
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="name" placeholder="Your full name" value="${this.profile.name}">
+                    </div>
+                    <div class="form-group">
+                        <label>Target School</label>
+                        <select id="targetSchool">
+                            <option ${this.profile.targetSchool === 'MIT' ? 'selected' : ''}>MIT</option>
+                            <option ${this.profile.targetSchool === 'Harvard' ? 'selected' : ''}>Harvard</option>
+                            <option ${this.profile.targetSchool === 'Stanford' ? 'selected' : ''}>Stanford</option>
+                            <option ${this.profile.targetSchool === 'Yale' ? 'selected' : ''}>Yale</option>
+                            <option ${this.profile.targetSchool === 'Princeton' ? 'selected' : ''}>Princeton</option>
+                            <option ${this.profile.targetSchool === 'Caltech' ? 'selected' : ''}>Caltech</option>
+                            <option ${this.profile.targetSchool === 'UC Berkeley' ? 'selected' : ''}>UC Berkeley</option>
+                        </select>
+                    </div>
+                `;
+                document.getElementById('name').addEventListener('change', (e) => {
+                    this.profile.name = e.target.value;
+                });
+                document.getElementById('targetSchool').addEventListener('change', (e) => {
+                    this.profile.targetSchool = e.target.value;
+                });
+            },
+
+            renderCoreAcademics(container) {
+                container.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Unweighted GPA</label>
+                            <input type="number" id="unweightedGPA" step="0.01" placeholder="Unweighted GPA" value="${this.profile.unweightedGPA}">
+                        </div>
+                        <div class="form-group">
+                            <label>GPA Scale</label>
+                            <select id="gpaScale">
+                                <option ${this.profile.gpaScale === '4.0' ? 'selected' : ''}>4.0 scale</option>
+                                <option ${this.profile.gpaScale === '4.33' ? 'selected' : ''}>4.33 scale</option>
+                                <option ${this.profile.gpaScale === '5.0' ? 'selected' : ''}>5.0 scale</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Weighted GPA (optional)</label>
+                        <input type="number" id="weightedGPA" step="0.01" placeholder="Weighted GPA" value="${this.profile.weightedGPA}">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>SAT Composite</label>
+                            <input type="number" id="satComposite" placeholder="SAT Score" value="${this.profile.satComposite}">
+                        </div>
+                        <div class="form-group">
+                            <label>ACT Composite</label>
+                            <input type="number" id="actComposite" placeholder="ACT Score" value="${this.profile.actComposite}">
+                        </div>
+                    </div>
+                `;
+                ['unweightedGPA', 'gpaScale', 'weightedGPA', 'satComposite', 'actComposite'].forEach(id => {
+                    const el = document.getElementById(id);
+                    el.addEventListener('change', (e) => {
+                        this.profile[id] = e.target.value;
+                    });
+                });
+            },
+
+            renderItemList(container, field, labels) {
+                let html = '<div class="item-list">';
+                this.profile[field].forEach((item, idx) => {
+                    html += `<div class="item-entry">
+                        <div class="item-header">
+                            <h4>Item ${idx + 1}</h4>
+                            ${this.profile[field].length > 1 ? `<button class="btn-delete" onclick="app.removeItem('${field}', ${idx})">✕</button>` : ''}
+                        </div>
+                        <div class="item-fields">`;
+                    labels.forEach(label => {
+                        const fullClass = label.full ? 'item-field-full' : '';
+                        const value = item[label.key] || '';
+                        if (label.type === 'checkbox') {
+                            html += `<div class="${fullClass}">
+                                <label class="checkbox-group">
+                                    <input type="checkbox" ${value ? 'checked' : ''} onchange="app.updateItem('${field}', ${idx}, '${label.key}', this.checked)">
+                                    <span>${label.label}</span>
+                                </label>
+                            </div>`;
+                        } else if (label.type === 'select') {
+                            html += `<div class="${fullClass} form-group">
+                                <label>${label.label}</label>
+                                <select onchange="app.updateItem('${field}', ${idx}, '${label.key}', this.value)">
+                                    ${label.options.map(opt => `<option ${value === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                                </select>
+                            </div>`;
+                        } else {
+                            html += `<div class="${fullClass} form-group">
+                                <label>${label.label}</label>
+                                <input type="${label.type || 'text'}" value="${value}" onchange="app.updateItem('${field}', ${idx}, '${label.key}', this.value)">
+                            </div>`;
+                        }
+                    });
+                    html += `</div></div>`;
+                });
+                html += `<button class="btn-add" onclick="app.addItem('${field}')">+ Add ${field.slice(0, -1)}</button></div>`;
+                container.innerHTML = html;
+            },
+
+            renderEssaysAndRecs(container) {
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label>Essay Quality Percentile (1-99)</label>
+                        <input type="number" id="essay" min="1" max="99" value="${this.profile.essay}">
+                    </div>
+                    <div class="form-group">
+                        <label>Teacher Rec 1</label>
+                        <select id="teacherRec1">
+                            <option ${this.profile.teacherRec1 === 'weak' ? 'selected' : ''}>Weak</option>
+                            <option ${this.profile.teacherRec1 === 'average' ? 'selected' : ''}>Average</option>
+                            <option ${this.profile.teacherRec1 === 'strong' ? 'selected' : ''}>Strong</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Teacher Rec 2</label>
+                        <select id="teacherRec2">
+                            <option ${this.profile.teacherRec2 === 'weak' ? 'selected' : ''}>Weak</option>
+                            <option ${this.profile.teacherRec2 === 'average' ? 'selected' : ''}>Average</option>
+                            <option ${this.profile.teacherRec2 === 'strong' ? 'selected' : ''}>Strong</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Counselor Rec</label>
+                        <select id="counselorRec">
+                            <option ${this.profile.counselorRec === 'weak' ? 'selected' : ''}>Weak</option>
+                            <option ${this.profile.counselorRec === 'average' ? 'selected' : ''}>Average</option>
+                            <option ${this.profile.counselorRec === 'strong' ? 'selected' : ''}>Strong</option>
+                        </select>
+                    </div>
+                `;
+                ['essay', 'teacherRec1', 'teacherRec2', 'counselorRec'].forEach(id => {
+                    const el = document.getElementById(id);
+                    el.addEventListener('change', (e) => {
+                        this.profile[id] = e.target.value;
+                    });
+                });
+            },
+
+            renderDemographics(container) {
+                container.innerHTML = `
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="firstGen" ${this.profile.firstGen ? 'checked' : ''} onchange="app.updateDemographic('firstGen', this.checked)">
+                        <label for="firstGen">First-generation student</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="urm" ${this.profile.urm ? 'checked' : ''} onchange="app.updateDemographic('urm', this.checked)">
+                        <label for="urm">Underrepresented minority</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="legacy" ${this.profile.legacy ? 'checked' : ''} onchange="app.updateDemographic('legacy', this.checked)">
+                        <label for="legacy">Legacy at target school</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="lowIncome" ${this.profile.lowIncome ? 'checked' : ''} onchange="app.updateDemographic('lowIncome', this.checked)">
+                        <label for="lowIncome">Low income</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="international" ${this.profile.international ? 'checked' : ''} onchange="app.updateDemographic('international', this.checked)">
+                        <label for="international">International student</label>
+                    </div>
+                `;
+            },
+
+            updateDemographic(key, value) {
+                this.profile[key] = value;
+            },
+
+            addItem(field) {
+                const templates = {
+                    apCourses: { name: '', score: '', yearTaken: 2024 },
+                    courses: { name: '', level: 'regular', grade: 'A' },
+                    extracurriculars: { name: '', role: '', years: 1, hoursPerWeek: 5, level: 'school', leadership: false },
+                    sports: { name: '', level: 'varsity', yearsPlayed: 1, position: '', recruited: false },
+                    projects: { name: '', type: 'personal', impactScore: 5, githubUrl: '', stars: 0 },
+                    research: { name: '', field: '', mentor: '', institution: '', durationMonths: 3, publications: 0, conferences: 0 },
+                    awards: { name: '', level: 'school', year: 2024 },
+                };
+                this.profile[field].push(templates[field]);
+                this.renderStep();
+            },
+
+            removeItem(field, index) {
+                this.profile[field].splice(index, 1);
+                this.renderStep();
+            },
+
+            updateItem(field, index, key, value) {
+                if (key.includes('score') || key.includes('years') || key.includes('Stars') || key.includes('publications') || key.includes('conferences') || key.includes('Months') || key.includes('Impact') || key === 'yearTaken' || key === 'year') {
+                    value = value ? parseInt(value) : '';
+                }
+                this.profile[field][index][key] = value;
+            },
+
+            renderButtons(container) {
+                let html = '';
+                if (this.currentStep > 0) {
+                    html += `<button class="btn btn-secondary" onclick="app.previousStep()">Previous</button>`;
+                }
+                if (this.currentStep < this.steps.length - 1) {
+                    html += `<button class="btn btn-primary" onclick="app.nextStep()">Next</button>`;
+                } else {
+                    const canGenerate = this.profile.name && this.profile.unweightedGPA;
+                    html += `<button class="btn btn-success" onclick="app.generateReport()" ${canGenerate ? '' : 'disabled'}>Generate Full Report & Plan</button>`;
+                }
+                container.innerHTML = html;
+            },
+
+            nextStep() {
+                if (this.currentStep < this.steps.length - 1) {
+                    this.currentStep++;
+                    this.renderStep();
+                    this.updateProgressBar();
+                }
+            },
+
+            previousStep() {
+                if (this.currentStep > 0) {
+                    this.currentStep--;
+                    this.renderStep();
+                    this.updateProgressBar();
+                }
+            },
+
+            updateProgressBar() {
+                const bar = document.getElementById('progressBar');
+                let html = '';
+                for (let i = 0; i < this.steps.length; i++) {
+                    let className = 'progress-step';
+                    if (i < this.currentStep) className += ' complete';
+                    if (i === this.currentStep) className += ' active';
+                    html += `<div class="${className}"></div>`;
+                }
+                bar.innerHTML = html;
+            },
+
+            calculateScore() {
+                const normalizedGPA = (parseFloat(this.profile.unweightedGPA) / parseFloat(this.profile.gpaScale)) * 4.0;
+                const gpaScore = Math.min(100, (normalizedGPA / 4.0) * 100);
+                
+                let testScore = 50;
+                if (this.profile.satComposite) {
+                    testScore = ((parseInt(this.profile.satComposite) - 400) / 1200) * 100;
+                } else if (this.profile.actComposite) {
+                    testScore = ((parseInt(this.profile.actComposite) - 1) / 35) * 100;
+                }
+
+                const apBonus = this.profile.apCourses.filter(ap => ap.name && ap.score).reduce((sum, ap) => sum + (parseInt(ap.score) / 5) * 10, 0);
+                const courseRigor = this.profile.courses.filter(c => c.level === 'AP' || c.level === 'IB' || c.level === 'honors').length * 5;
+                
+                const academicsScore = Math.min(100, (gpaScore * 0.5 + Math.min(100, testScore) * 0.3 + apBonus * 0.1 + courseRigor * 0.1) / 0.9);
+
+                let activitiesScore = 30;
+                this.profile.extracurriculars.forEach(ec => {
+                    if (ec.name) {
+                        const levelScore = { school: 30, city: 50, state: 70, national: 85, international: 100 }[ec.level] || 30;
+                        const leadershipBonus = ec.leadership ? 15 : 0;
+                        const commitmentBonus = (ec.hoursPerWeek * ec.years) > 20 ? 10 : 0;
+                        activitiesScore += (levelScore + leadershipBonus + commitmentBonus) / this.profile.extracurriculars.length;
+                    }
+                });
+
+                let sportsScore = 0;
+                const activeSports = this.profile.sports.filter(s => s.name);
+                activeSports.forEach(sport => {
+                    const levelScore = sport.level === 'varsity' ? 50 : sport.level === 'JV' ? 35 : 20;
+                    const recruitedBonus = sport.recruited ? 20 : 0;
+                    sportsScore += levelScore + recruitedBonus;
+                });
+                if (activeSports.length > 0) {
+                    sportsScore = sportsScore / activeSports.length;
+                }
+
+                let projectsScore = 20;
+                const activeProjects = this.profile.projects.filter(p => p.name);
+                activeProjects.forEach(proj => {
+                    const baseScore = proj.impactScore * 10;
+                    const githubBonus = proj.stars > 10 ? Math.min(20, proj.stars / 5) : 0;
+                    projectsScore += baseScore + githubBonus;
+                });
+                if (activeProjects.length > 0) {
+                    projectsScore = projectsScore / activeProjects.length;
+                }
+
+                let researchScore = 0;
+                const activeResearch = this.profile.research.filter(r => r.name);
+                activeResearch.forEach(res => {
+                    researchScore += 50 + (res.publications * 15) + (res.conferences * 10) + (res.durationMonths * 0.5);
+                });
+                if (activeResearch.length > 0) {
+                    researchScore = Math.min(100, researchScore / activeResearch.length);
+                }
+
+                const projectsResearchScore = (projectsScore + researchScore) / 2;
+                const extracurricularsScore = (activitiesScore + sportsScore) / 2;
+
+                const recScores = [
+                    { weak: 40, average: 70, strong: 90 }[this.profile.teacherRec1] || 70,
+                    { weak: 40, average: 70, strong: 90 }[this.profile.teacherRec2] || 70,
+                    { weak: 40, average: 70, strong: 90 }[this.profile.counselorRec] || 70,
+                ];
+                const essaysRecsScore = (parseInt(this.profile.essay) + recScores.reduce((a, b) => a + b) / recScores.length) / 2;
+
+                let contextScore = 50;
+                if (this.profile.firstGen) contextScore += 12;
+                if (this.profile.urm) contextScore += 12;
+                if (this.profile.legacy) contextScore += 8;
+                if (this.profile.lowIncome) contextScore += 10;
+
+                const weights = { academics: 0.5, projects: 0.2, extracurriculars: 0.15, essays: 0.1, context: 0.05 };
+                const overallScore = (
+                    academicsScore * weights.academics +
+                    projectsResearchScore * weights.projects +
+                    extracurricularsScore * weights.extracurriculars +
+                    essaysRecsScore * weights.essays +
+                    Math.min(100, contextScore) * weights.context
+                );
+
+                const sigmoid = (x) => 100 / (1 + Math.exp(-(x - 50) / 15));
+                const probability = sigmoid(overallScore);
+                const margin = overallScore > 75 || overallScore < 25 ? 8 : 12;
+
+                return {
+                    overallScore: Math.round(overallScore * 10) / 10,
+                    probability: Math.round(probability),
+                    lower: Math.max(0, Math.round(probability - margin)),
+                    upper: Math.min(100, Math.round(probability + margin)),
+                    breakdown: {
+                        academics: Math.round(academicsScore * 10) / 10,
+                        projects: Math.round(projectsResearchScore * 10) / 10,
+                        extracurriculars: Math.round(extracurricularsScore * 10) / 10,
+                        essays: Math.round(essaysRecsScore * 10) / 10,
+                        context: Math.round(Math.min(100, contextScore) * 10) / 10,
+                    },
+                };
+            },
+
+            generateSchedule() {
+                const improvements = [];
+
+                if (parseFloat(this.profile.unweightedGPA) < 3.5) {
+                    improvements.push({
+                        priority: 1,
+                        category: 'GPA',
+                        action: 'Focus on next grading period',
+                        detail: 'Target A/A+ in all classes, especially STEM if below 3.5',
+                        timeline: '8-12 weeks',
+                        expectedLift: 8,
+                        tasks: ['Get tutoring in challenging subjects', 'Weekly study groups', 'Office hours with teachers']
+                    });
+                }
+
+                if (!this.profile.satComposite && !this.profile.actComposite) {
+                    improvements.push({
+                        priority: 1,
+                        category: 'Standardized Tests',
+                        action: 'Take SAT or ACT',
+                        detail: 'Missing test scores are major gap. Target 1450+ SAT or 33+ ACT',
+                        timeline: '12-16 weeks',
+                        expectedLift: 12,
+                        tasks: ['Register for test', 'Start prep course', 'Practice 2 hours/day', 'Take 2-3 practice tests']
+                    });
+                }
+
+                if (this.profile.apCourses.filter(ap => ap.name).length < 3) {
+                    improvements.push({
+                        priority: 2,
+                        category: 'Academic Rigor',
+                        action: 'Enroll in more AP courses',
+                        detail: 'Increase rigor with 2-3 more AP courses next year',
+                        timeline: '6 months',
+                        expectedLift: 6,
+                        tasks: ['Talk to counselor about AP offerings', 'Choose courses matching interests', 'Start summer prep']
+                    });
+                }
+
+                if (this.profile.projects.filter(p => p.name).length === 0) {
+                    improvements.push({
+                        priority: 1,
+                        category: 'Projects',
+                        action: 'Start a portfolio project',
+                        detail: 'Build something tangible (app, research, design, etc.)',
+                        timeline: '8-12 weeks',
+                        expectedLift: 10,
+                        tasks: ['Ideate project', 'Break into milestones', 'Code/build weekly', 'Share on GitHub']
+                    });
+                }
+
+                if (this.profile.research.filter(r => r.name).length === 0) {
+                    improvements.push({
+                        priority: 2,
+                        category: 'Research',
+                        action: 'Seek research opportunity',
+                        detail: 'Reach out to professors or research labs',
+                        timeline: '4-8 weeks',
+                        expectedLift: 12,
+                        tasks: ['Identify professors/labs', 'Email inquiry', 'Attend lab meetings', 'Propose research direction']
+                    });
+                }
+
+                if (this.profile.extracurriculars.filter(e => e.name).length < 2) {
+                    improvements.push({
+                        priority: 2,
+                        category: 'Extracurriculars',
+                        action: 'Join/start meaningful activities',
+                        detail: 'Depth over quantity. Leadership in 2-3 activities',
+                        timeline: 'Ongoing',
+                        expectedLift: 7,
+                        tasks: ['Research clubs/teams', 'Attend meetings', 'Take on responsibility', 'Propose new initiative']
+                    });
+                }
+
+                return improvements.sort((a, b) => a.priority - b.priority);
+            },
+
+            generateReport() {
+                const scoreData = this.calculateScore();
+                const improvements = this.generateSchedule();
+                this.report = { ...scoreData, targetSchool: this.profile.targetSchool, name: this.profile.name };
+                this.schedule = improvements;
+                this.showReport();
+            },
+
+            showReport() {
+                document.getElementById('calculator').classList.add('hidden');
+                document.getElementById('report').classList.remove('hidden');
+                this.renderReport();
+            },
+
+            showCalculator() {
+                document.getElementById('report').classList.add('hidden');
+                document.getElementById('calculator').classList.remove('hidden');
+            },
+
+            renderReport() {
+                const sidebar = document.getElementById('reportSidebar');
+                const main = document.getElementById('reportMain');
+
+                sidebar.innerHTML = `
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Improvement Plan</h2>
+                        </div>
+                        <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                            <div class="improvement-list">
+                                ${this.schedule.map((item, idx) => `
+                                    <div class="improvement-item improvement-priority-${item.priority}">
+                                        <div class="improvement-header">
+                                            <div class="priority-badge">${item.priority}</div>
+                                            <div>
+                                                <div class="improvement-category">${item.category}</div>
+                                                <div class="improvement-action">${item.action}</div>
+                                            </div>
+                                        </div>
+                                        <div class="improvement-detail">${item.detail}</div>
+                                        <div class="improvement-meta">
+                                            <span>${item.timeline}</span>
+                                            <span class="lift-badge">+${item.expectedLift}%</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                main.innerHTML = `
+                    <div class="card">
+                        <div class="card-header">
+                            <h1>${this.report.name}</h1>
+                            <p>${this.report.targetSchool}</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="report-grid">
+                                <div class="score-box">
+                                    <div class="score-label">Overall Score</div>
+                                    <div class="score-value">${this.report.overallScore}</div>
+                                    <div class="score-unit">/100</div>
+                                </div>
+                                <div class="score-box">
+                                    <div class="score-label">Admission Probability</div>
+                                    <div class="score-value">${this.report.probability}%</div>
+                                    <div class="score-unit">(${this.report.lower}–${this.report.upper}%)</div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 30px;">
+                                <h3 style="margin-bottom: 20px; font-weight: 600;">Category Breakdown</h3>
+                                ${Object.entries(this.report.breakdown).map(([key, value]) => `
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-label">
+                                            <span>${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}</span>
+                                            <span>${value}/100</span>
+                                        </div>
+                                        <div class="breakdown-bar">
+                                            <div class="breakdown-fill" style="width: ${value}%"></div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top: 20px;">
+                        <div class="card-header">
+                            <h2>Actionable Roadmap</h2>
+                        </div>
+                        <div class="card-body">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                                ${this.schedule.map((item, idx) => `
+                                    <div style="background: #252525; border: 1px solid #444; border-radius: 8px; padding: 20px;">
+                                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                                            <div style="width: 36px; height: 36px; background: #666; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9em;">${idx + 1}</div>
+                                            <div>
+                                                <div style="font-weight: 600;">${item.category}</div>
+                                                <div style="font-size: 0.85em; color: #888;">${item.timeline}</div>
+                                            </div>
+                                        </div>
+                                        <div style="font-weight: 500; margin-bottom: 10px;">${item.action}</div>
+                                        <div style="color: #888; font-size: 0.9em; margin-bottom: 15px;">${item.detail}</div>
+                                        <div style="background: #1a1a1a; border-radius: 6px; padding: 12px; margin-bottom: 15px;">
+                                            <div style="font-weight: 600; font-size: 0.85em; margin-bottom: 10px;">Tasks:</div>
+                                            <ul style="list-style: none;">
+                                                ${item.tasks.map(task => `<li style="color: #888; font-size: 0.85em; margin-bottom: 5px;">• ${task}</li>`).join('')}
+                                            </ul>
+                                        </div>
+                                        <div style="background: #222; border: 1px solid #444; border-radius: 6px; padding: 10px; text-align: center;">
+                                            <div style="color: #888; font-weight: 600;">Expected Lift: +${item.expectedLift}%</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        };
+
+        app.init();
+    </script>
+<p>hi uwu</p>
+</body>
+</html>
