@@ -127,36 +127,58 @@ async function loadVideo() {
 }
 
 
-/* =========================
-   YOUTUBE
-========================= */
-
 async function loadYouTube(frame, query) {
 
-    const response = await fetch(
+    // Step 1: Search videos
+    const searchResponse = await fetch(
         `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(query)}&maxResults=25&key=${YT_KEYS[ytKeyIndex]}`
     );
 
-    if (response.status === 403) {
+    if (searchResponse.status === 403) {
         ytKeyIndex = (ytKeyIndex + 1) % YT_KEYS.length;
         return loadYouTube(frame, query);
     }
 
-    if (!response.ok) {
-        throw new Error("YouTube request failed.");
+    if (!searchResponse.ok) {
+        throw new Error("YouTube search failed.");
     }
 
-    const data = await response.json();
+    const searchData = await searchResponse.json();
 
-    if (!data.items || data.items.length === 0) {
-        throw new Error("No YouTube results.");
+    if (!searchData.items || searchData.items.length === 0) {
+        throw new Error("No search results.");
     }
 
+    // Step 2: Get video IDs
+    const videoIds = searchData.items.map(item => item.id.videoId).join(",");
+
+    // Step 3: Get statistics
+    const statsResponse = await fetch(
+        `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoIds}&key=${YT_KEYS[ytKeyIndex]}`
+    );
+
+    if (!statsResponse.ok) {
+        throw new Error("YouTube stats request failed.");
+    }
+
+    const statsData = await statsResponse.json();
+
+    // Step 4: Filter under 5000 views
+    const obscureVideos = statsData.items.filter(video =>
+        parseInt(video.statistics.viewCount) < 5000
+    );
+
+    if (obscureVideos.length === 0) {
+        throw new Error("No videos under 5000 views found.");
+    }
+
+    // Step 5: Pick random obscure one
     const randomVideo =
-        data.items[Math.floor(Math.random() * data.items.length)];
+        obscureVideos[Math.floor(Math.random() * obscureVideos.length)];
 
-    frame.src = `https://www.youtube.com/embed/${randomVideo.id.videoId}`;
+    frame.src = `https://www.youtube.com/embed/${randomVideo.id}`;
 }
+
 
 
 /* =========================
@@ -249,3 +271,4 @@ function getRandomWord() {
 
 </body>
 </html>
+
