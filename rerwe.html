@@ -36,17 +36,22 @@ button {
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 button:hover {
     background-color: #c2c2c2;
 }
 
-select {
+select, input {
     padding: 5px;
     font-size: 14px;
-    margin-top: 15px;
+    margin-top: 10px;
+}
+
+input {
+    width: 300px;
+    border: 1px solid #888;
 }
 </style>
 </head>
@@ -56,6 +61,12 @@ select {
 <h1>ObscureYT</h1>
 <h4>A PetitTube Inspired Page</h4>
 
+<br>
+
+<input type="text" id="searchInput" placeholder="Enter search terms...">
+
+<br>
+
 <select id="platformSelect">
     <option value="youtube">YouTube</option>
     <option value="dailymotion">Dailymotion</option>
@@ -64,7 +75,7 @@ select {
 
 <br>
 
-<button onclick="loadRandomVideo()">Load Random Video</button>
+<button onclick="loadVideo()">Search / Load Video</button>
 
 <br>
 
@@ -77,32 +88,37 @@ select {
 ========================= */
 
 const YT_KEYS = [
-    "YOUR_YOUTUBE_KEY_1",
-    "YOUR_YOUTUBE_KEY_2"
+    "AIzaSyCIRHDP5IxjlL3q2r9LXp3_7TFJPY6NumY",
+    "AIzaSyCxoYR72WIhJwZXAxPC7OTKHAWv05VWj40",
+    "AIzaSyD3d9FIrzCnrtPh8OVV5yaAnLnoIOUzjFY",
+    "AIzaSyAz_rSdU2nxA6EzFfPDHAWglPjPWfQpn5A"
 ];
 
 let ytKeyIndex = 0;
 
-const VIMEO_TOKEN = "YOUR_VIMEO_TOKEN"; // Leave empty if not using Vimeo
+const VIMEO_TOKEN = "7681d0235110de72643cd3743ac49fe5"; // Leave blank if not using Vimeo
 
 
 /* =========================
-   MAIN CONTROLLER
+   MAIN FUNCTION
 ========================= */
 
-async function loadRandomVideo() {
+async function loadVideo() {
     const platform = document.getElementById("platformSelect").value;
     const frame = document.getElementById("videoFrame");
+    const searchValue = document.getElementById("searchInput").value.trim();
+
+    const query = searchValue !== "" ? searchValue : getRandomWord();
 
     try {
         if (platform === "youtube") {
-            await loadYouTube(frame);
+            await loadYouTube(frame, query);
         } 
         else if (platform === "dailymotion") {
-            await loadDailymotion(frame);
+            await loadDailymotion(frame, query);
         } 
         else if (platform === "vimeo") {
-            await loadVimeo(frame);
+            await loadVimeo(frame, query);
         }
     } catch (err) {
         console.error(err);
@@ -115,16 +131,15 @@ async function loadRandomVideo() {
    YOUTUBE
 ========================= */
 
-async function loadYouTube(frame) {
-    const randomQuery = getRandomWord();
+async function loadYouTube(frame, query) {
 
     const response = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${randomQuery}&maxResults=25&key=${YT_KEYS[ytKeyIndex]}`
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(query)}&maxResults=25&key=${YT_KEYS[ytKeyIndex]}`
     );
 
     if (response.status === 403) {
         ytKeyIndex = (ytKeyIndex + 1) % YT_KEYS.length;
-        return loadYouTube(frame);
+        return loadYouTube(frame, query);
     }
 
     if (!response.ok) {
@@ -148,9 +163,10 @@ async function loadYouTube(frame) {
    DAILYMOTION
 ========================= */
 
-async function loadDailymotion(frame) {
+async function loadDailymotion(frame, query) {
+
     const response = await fetch(
-        "https://api.dailymotion.com/videos?limit=50"
+        `https://api.dailymotion.com/videos?search=${encodeURIComponent(query)}&limit=50`
     );
 
     if (!response.ok) {
@@ -160,7 +176,7 @@ async function loadDailymotion(frame) {
     const data = await response.json();
 
     if (!data.list || data.list.length === 0) {
-        throw new Error("No Dailymotion videos.");
+        throw new Error("No Dailymotion results.");
     }
 
     const randomVideo =
@@ -174,14 +190,14 @@ async function loadDailymotion(frame) {
    VIMEO
 ========================= */
 
-async function loadVimeo(frame) {
+async function loadVimeo(frame, query) {
 
     if (!VIMEO_TOKEN) {
         throw new Error("Add your Vimeo token to use Vimeo.");
     }
 
     const response = await fetch(
-        "https://api.vimeo.com/videos?per_page=25",
+        `https://api.vimeo.com/videos?query=${encodeURIComponent(query)}&per_page=25`,
         {
             headers: {
                 Authorization: `Bearer ${VIMEO_TOKEN}`
@@ -196,7 +212,7 @@ async function loadVimeo(frame) {
     const data = await response.json();
 
     if (!data.data || data.data.length === 0) {
-        throw new Error("No Vimeo videos.");
+        throw new Error("No Vimeo results.");
     }
 
     const randomVideo =
@@ -209,7 +225,7 @@ async function loadVimeo(frame) {
 
 
 /* =========================
-   RANDOM SEARCH WORDS
+   RANDOM WORD FALLBACK
 ========================= */
 
 function getRandomWord() {
