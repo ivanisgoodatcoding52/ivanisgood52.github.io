@@ -46,10 +46,10 @@ button:hover {
 select, input {
     padding: 5px;
     font-size: 14px;
-    margin-top: 10px;
+    margin-top: 5px;
 }
 
-input {
+input[type="text"] {
     width: 300px;
     border: 1px solid #888;
 }
@@ -59,21 +59,48 @@ input {
 <body>
 
 <h1>ObscureYT</h1>
-<h4>A PetitTube Inspired Page</h4>
+<h4>Archive Excavation Engine</h4>
 
 <br>
 
 <input type="text" id="searchInput" placeholder="Enter search terms...">
 
-<br>
+<br><br>
 
-<select id="platformSelect">
-    <option value="youtube">YouTube</option>
-    <option value="dailymotion">Dailymotion</option>
-    <option value="vimeo">Vimeo</option>
+<label><b>Published Before:</b></label>
+<input type="date" id="beforeDate">
+
+<br><br>
+
+<label><b>Max Views:</b></label>
+<input type="range" id="viewLimit" min="100" max="50000" step="100" value="5000"
+oninput="document.getElementById('viewValue').innerText = this.value">
+<span id="viewValue">5000</span>
+
+<br><br>
+
+<label><b>Sort Mode:</b></label>
+<select id="sortMode">
+    <option value="date">Newest First</option>
+    <option value="viewCount">Lowest Views First</option>
+    <option value="relevance">Relevance</option>
 </select>
 
+<br><br>
+
+<label>
+<input type="checkbox" id="randomYearMode">
+Random Year Mode
+</label>
+
 <br>
+
+<label>
+<input type="checkbox" id="autoPlayToggle">
+Infinite Autoplay
+</label>
+
+<br><br>
 
 <button onclick="loadVideo()">Search / Load Video</button>
 
@@ -83,187 +110,159 @@ input {
 
 <script>
 
-/* =========================
-   CONFIG
-========================= */
+/* ================= CONFIG ================= */
 
 const YT_KEYS = [
-    "AIzaSyCIRHDP5IxjlL3q2r9LXp3_7TFJPY6NumY",
-    "AIzaSyCxoYR72WIhJwZXAxPC7OTKHAWv05VWj40",
-    "AIzaSyD3d9FIrzCnrtPh8OVV5yaAnLnoIOUzjFY",
-    "AIzaSyAz_rSdU2nxA6EzFfPDHAWglPjPWfQpn5A"
+    "YOUR_YOUTUBE_KEY_1",
+    "YOUR_YOUTUBE_KEY_2"
 ];
 
 let ytKeyIndex = 0;
 
-const VIMEO_TOKEN = "7681d0235110de72643cd3743ac49fe5"; // Leave blank if not using Vimeo
+let playedVideos = new Set();
+let youtubePool = [];
+let isLoading = false;
 
-
-/* =========================
-   MAIN FUNCTION
-========================= */
+/* ================= MAIN ================= */
 
 async function loadVideo() {
-    const platform = document.getElementById("platformSelect").value;
-    const frame = document.getElementById("videoFrame");
-    const searchValue = document.getElementById("searchInput").value.trim();
 
+    const searchValue = document.getElementById("searchInput").value.trim();
     const query = searchValue !== "" ? searchValue : getRandomWord();
 
-    try {
-        if (platform === "youtube") {
-            await loadYouTube(frame, query);
-        } 
-        else if (platform === "dailymotion") {
-            await loadDailymotion(frame, query);
-        } 
-        else if (platform === "vimeo") {
-            await loadVimeo(frame, query);
-        }
-    } catch (err) {
-        console.error(err);
-        alert("Failed to load video.");
-    }
+    await loadYouTube(document.getElementById("videoFrame"), query);
 }
 
+/* ================= YOUTUBE ================= */
 
 async function loadYouTube(frame, query) {
 
-    // Step 1: Search videos
-    const searchResponse = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(query)}&maxResults=25&key=${YT_KEYS[ytKeyIndex]}`
-    );
+    if (isLoading) return;
+    isLoading = true;
 
-    if (searchResponse.status === 403) {
-        ytKeyIndex = (ytKeyIndex + 1) % YT_KEYS.length;
+    const beforeDateInput = document.getElementById("beforeDate").value;
+    const viewLimit = parseInt(document.getElementById("viewLimit").value);
+    const sortMode = document.getElementById("sortMode").value;
+    const randomYearMode = document.getElementById("randomYearMode").checked;
+
+    let publishedBefore = "";
+
+    if (randomYearMode) {
+        const randomYear = Math.floor(Math.random() * (2022 - 2005)) + 2005;
+        const randomDate = new Date(randomYear, 11, 31);
+        publishedBefore = randomDate.toISOString();
+    } else if (beforeDateInput) {
+        publishedBefore = new Date(beforeDateInput).toISOString();
+    }
+
+    if (youtubePool.length === 0) {
+
+        let collected = [];
+        let pageToken = null;
+
+        for (let i = 0; i < 3; i++) {
+
+            let url =
+                `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(query)}&maxResults=50&order=${sortMode}&key=${YT_KEYS[ytKeyIndex]}`;
+
+            if (publishedBefore) {
+                url += `&publishedBefore=${publishedBefore}`;
+            }
+
+            if (pageToken) {
+                url += `&pageToken=${pageToken}`;
+            }
+
+            const response = await fetch(url);
+
+            if (response.status === 403) {
+                ytKeyIndex = (ytKeyIndex + 1) % YT_KEYS.length;
+                isLoading = false;
+                return loadYouTube(frame, query);
+            }
+
+            if (!response.ok) {
+                isLoading = false;
+                throw new Error("YouTube search failed.");
+            }
+
+            const data = await response.json();
+
+            if (!data.items) break;
+
+            collected.push(...data.items);
+            pageToken = data.nextPageToken;
+
+            if (!pageToken) break;
+        }
+
+        if (collected.length === 0) {
+            isLoading = false;
+            alert("No YouTube results found.");
+            return;
+        }
+
+        const ids = collected.map(v => v.id.videoId).join(",");
+
+        const statsResponse = await fetch(
+            `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids}&key=${YT_KEYS[ytKeyIndex]}`
+        );
+
+        if (!statsResponse.ok) {
+            isLoading = false;
+            throw new Error("Stats request failed.");
+        }
+
+        const statsData = await statsResponse.json();
+
+        const obscure = statsData.items.filter(video =>
+            parseInt(video.statistics.viewCount) <= viewLimit
+        );
+
+        if (obscure.length === 0) {
+            isLoading = false;
+            alert("No obscure videos found.");
+            return;
+        }
+
+        youtubePool = obscure.sort(() => 0.5 - Math.random());
+    }
+
+    youtubePool = youtubePool.filter(v => !playedVideos.has(v.id));
+
+    if (youtubePool.length === 0) {
+        playedVideos.clear();
+        isLoading = false;
         return loadYouTube(frame, query);
     }
 
-    if (!searchResponse.ok) {
-        throw new Error("YouTube search failed.");
-    }
+    const nextVideo = youtubePool.pop();
 
-    const searchData = await searchResponse.json();
+    playedVideos.add(nextVideo.id);
 
-    if (!searchData.items || searchData.items.length === 0) {
-        throw new Error("No search results.");
-    }
+    frame.src = `https://www.youtube.com/embed/${nextVideo.id}?autoplay=1`;
 
-    // Step 2: Get video IDs
-    const videoIds = searchData.items.map(item => item.id.videoId).join(",");
-
-    // Step 3: Get statistics
-    const statsResponse = await fetch(
-        `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoIds}&key=${YT_KEYS[ytKeyIndex]}`
-    );
-
-    if (!statsResponse.ok) {
-        throw new Error("YouTube stats request failed.");
-    }
-
-    const statsData = await statsResponse.json();
-
-    // Step 4: Filter under 5000 views
-    const obscureVideos = statsData.items.filter(video =>
-        parseInt(video.statistics.viewCount) < 5000
-    );
-
-    if (obscureVideos.length === 0) {
-        throw new Error("No videos under 5000 views found.");
-    }
-
-    // Step 5: Pick random obscure one
-    const randomVideo =
-        obscureVideos[Math.floor(Math.random() * obscureVideos.length)];
-
-    frame.src = `https://www.youtube.com/embed/${randomVideo.id}`;
+    isLoading = false;
 }
 
+/* ================= AUTOPLAY ================= */
 
+document.getElementById("videoFrame").addEventListener("load", () => {
 
-/* =========================
-   DAILYMOTION
-========================= */
+    if (!document.getElementById("autoPlayToggle").checked) return;
 
-async function loadDailymotion(frame, query) {
+    setTimeout(() => {
+        loadVideo();
+    }, 15000); // change delay if desired
+});
 
-    const response = await fetch(
-        `https://api.dailymotion.com/videos?search=${encodeURIComponent(query)}&limit=50`
-    );
-
-    if (!response.ok) {
-        throw new Error("Dailymotion request failed.");
-    }
-
-    const data = await response.json();
-
-    if (!data.list || data.list.length === 0) {
-        throw new Error("No Dailymotion results.");
-    }
-
-    const randomVideo =
-        data.list[Math.floor(Math.random() * data.list.length)];
-
-    frame.src = `https://www.dailymotion.com/embed/video/${randomVideo.id}`;
-}
-
-
-/* =========================
-   VIMEO
-========================= */
-
-async function loadVimeo(frame, query) {
-
-    if (!VIMEO_TOKEN) {
-        throw new Error("Add your Vimeo token to use Vimeo.");
-    }
-
-    const response = await fetch(
-        `https://api.vimeo.com/videos?query=${encodeURIComponent(query)}&per_page=25`,
-        {
-            headers: {
-                Authorization: `Bearer ${VIMEO_TOKEN}`
-            }
-        }
-    );
-
-    if (!response.ok) {
-        throw new Error("Vimeo request failed.");
-    }
-
-    const data = await response.json();
-
-    if (!data.data || data.data.length === 0) {
-        throw new Error("No Vimeo results.");
-    }
-
-    const randomVideo =
-        data.data[Math.floor(Math.random() * data.data.length)];
-
-    const videoId = randomVideo.uri.split("/").pop();
-
-    frame.src = `https://player.vimeo.com/video/${videoId}`;
-}
-
-
-/* =========================
-   RANDOM WORD FALLBACK
-========================= */
+/* ================= RANDOM WORD ================= */
 
 function getRandomWord() {
     const words = [
-        "hello",
-        "random",
-        "music",
-        "gaming",
-        "vlog",
-        "funny",
-        "2008",
-        "tutorial",
-        "test",
-        "old"
+        "hello","random","music","gaming","vlog",
+        "funny","2008","tutorial","old","test"
     ];
-
     return words[Math.floor(Math.random() * words.length)];
 }
 
@@ -271,4 +270,3 @@ function getRandomWord() {
 
 </body>
 </html>
-
