@@ -205,20 +205,36 @@ async function loadYouTube(frame, query) {
             return;
         }
 
-        const ids = collected.map(v => v.id.videoId).join(",");
+        // 🔥 REMOVE DUPLICATES
+        const uniqueIds = [...new Set(collected.map(v => v.id.videoId))];
 
-        const statsResponse = await fetch(
-            `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids}&key=${YT_KEYS[ytKeyIndex]}`
-        );
+        let allStats = [];
 
-        if (!statsResponse.ok) {
-            isLoading = false;
-            throw new Error("Stats request failed.");
+        // 🔥 CHUNK INTO 50 MAX (API LIMIT)
+        for (let i = 0; i < uniqueIds.length; i += 50) {
+
+            const chunk = uniqueIds.slice(i, i + 50);
+
+            const statsResponse = await fetch(
+                `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${chunk.join(",")}&key=${YT_KEYS[ytKeyIndex]}`
+            );
+
+            if (statsResponse.status === 403) {
+                ytKeyIndex = (ytKeyIndex + 1) % YT_KEYS.length;
+                isLoading = false;
+                return loadYouTube(frame, query);
+            }
+
+            if (!statsResponse.ok) {
+                isLoading = false;
+                throw new Error("Stats request failed.");
+            }
+
+            const statsData = await statsResponse.json();
+            allStats.push(...statsData.items);
         }
 
-        const statsData = await statsResponse.json();
-
-        const obscure = statsData.items.filter(video =>
+        const obscure = allStats.filter(video =>
             parseInt(video.statistics.viewCount) <= viewLimit
         );
 
@@ -231,6 +247,7 @@ async function loadYouTube(frame, query) {
         youtubePool = obscure.sort(() => 0.5 - Math.random());
     }
 
+    // 🔥 Prevent repeats
     youtubePool = youtubePool.filter(v => !playedVideos.has(v.id));
 
     if (youtubePool.length === 0) {
@@ -273,4 +290,5 @@ function getRandomWord() {
 
 </body>
 </html>
+
 
