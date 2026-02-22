@@ -1,12 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ObscureYT</title>
-
-<style>
-body {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ObscureYT</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        iframe {
+            width: 80%;
+            height: 500px;
+            border: none;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .slider-container {
+            margin-top: 20px;
+        }
+        .slider-label {
+            font-size: 16px;
+        }
+        .tag-input-container {
+            margin-top: 20px;
+        }
+        .tag-label {
+            font-size: 16px;
+        }
+        .tag-input {
+            padding: 5px;
+            font-size: 16px;
+            width: 50%;
+        }
+        .error-message {
+            color: red;
+            margin-top: 20px;
+        }
+        .quota-reset {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        body {
     font-family: Arial, sans-serif;
     background-color: #ccc;
     color: #333;
@@ -26,7 +65,6 @@ iframe {
     height: 360px;
     border: 3px solid #999;
     background-color: black;
-    margin-top: 20px;
 }
 
 button {
@@ -36,237 +74,193 @@ button {
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
-    margin-top: 10px;
 }
 
 button:hover {
     background-color: #c2c2c2;
 }
 
-select, input {
+.slider-container, .tag-input-container {
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.tag-input {
+    border: 1px solid #888;
     padding: 5px;
     font-size: 14px;
-    margin-top: 5px;
+    width: 50%;
+    background-color: white;
 }
 
-input[type="text"] {
-    width: 300px;
-    border: 1px solid #888;
+.error-message {
+    color: red;
+    font-weight: bold;
+    margin-top: 10px;
 }
-</style>
+
+.quota-reset {
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+    </style>
 </head>
-
 <body>
+    <h1>ObscureYT</h1>
+    <h4>A PetitTube Inspired Page</h4>
+    <iframe id="videoFrame" src="" allowfullscreen></iframe>
+    <br>
+    <button onclick="loadRandomVideo()">Load Random Video</button>
 
-<h1>ObscureYT</h1>
-<h4>Archive Excavation Engine</h4>
+    <div class="slider-container">
+        <label for="timeSlider" class="slider-label">Select Time Range (in Days):</label>
+        <input type="range" id="timeSlider" min="1" max="365" value="30">
+        <span id="sliderValue">30</span> days
+    </div>
 
-<br>
+    <div class="tag-input-container">
+        <label for="tagsInput" class="tag-label">Enter Tags (comma separated):</label>
+        <input type="text" id="tagsInput" class="tag-input" placeholder="e.g., nature, technology, music">
+    </div>
 
-<input type="text" id="searchInput" placeholder="Enter search terms...">
+    <div id="errorMessage" class="error-message"></div>
 
-<br><br>
+    <div id="quotaResetTime" class="quota-reset"></div>
 
-<label><b>Published Before:</b></label>
-<input type="date" id="beforeDate">
+    <script>
+        const q = [
+            'AIzaSyAz_rSdU2nxA6EzFfPDHAWglPjPWfQpn5A',
+            'AIzaSyD3d9FIrzCnrtPh8OVV5yaAnLnoIOUzjFY',
+            'AIzaSyCxoYR72WIhJwZXAxPC7OTKHAWv05VWj40',
+            'AIzaSyCIRHDP5IxjlL3q2r9LXp3_7TFJPY6NumY',
+            'AIzaSyDokI4VAgm_s5jxMrPsFG4d9u6GfTWmeT4'
+        ];
+        const t = 'https://www.googleapis.com/youtube/v3/search';
 
-<br><br>
+        let previousVideos = [];
+        let currentApiKeyIndex = 0;
 
-<label><b>Max Views:</b></label>
-<input type="range" id="viewLimit" min="100" max="50000" step="100" value="5000"
-oninput="document.getElementById('viewValue').innerText = this.value">
-<span id="viewValue">5000</span>
+        document.getElementById('timeSlider').addEventListener('input', function() {
+            document.getElementById('sliderValue').textContent = this.value;
+        });
 
-<br><br>
+        function generateRandomDate() {
+            const startDate = new Date('2005-02-27');
+            const endDate = new Date('2025-02-23');
+            const randomTime = startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime());
+            return new Date(randomTime).toISOString();
+        }
 
-<label><b>Sort Mode:</b></label>
-<select id="sortMode">
-    <option value="date">Newest First</option>
-    <option value="viewCount">Lowest Views First</option>
-    <option value="relevance">Relevance</option>
-</select>
+        function showError(message) {
+            document.getElementById("errorMessage").innerText = message;
+        }
 
-<br><br>
-
-<label>
-<input type="checkbox" id="randomYearMode">
-Random Year Mode
-</label>
-
-<br>
-
-<label>
-<input type="checkbox" id="autoPlayToggle">
-Infinite Autoplay
-</label>
-
-<br><br>
-
-<button onclick="loadVideo()">Search / Load Video</button>
-
-<br>
-
-<iframe id="videoFrame" allowfullscreen></iframe>
-
-<script>
-
-/* ================= CONFIG ================= */
-
-const YT_KEYS = [
-    "YOUR_YOUTUBE_KEY_1",
-    "YOUR_YOUTUBE_KEY_2"
-];
-
-let ytKeyIndex = 0;
-
-let playedVideos = new Set();
-let youtubePool = [];
-let isLoading = false;
-
-/* ================= MAIN ================= */
-
-async function loadVideo() {
-
-    const searchValue = document.getElementById("searchInput").value.trim();
-    const query = searchValue !== "" ? searchValue : getRandomWord();
-
-    await loadYouTube(document.getElementById("videoFrame"), query);
-}
-
-/* ================= YOUTUBE ================= */
-
-async function loadYouTube(frame, query) {
-
-    if (isLoading) return;
-    isLoading = true;
-
-    const beforeDateInput = document.getElementById("beforeDate").value;
-    const viewLimit = parseInt(document.getElementById("viewLimit").value);
-    const sortMode = document.getElementById("sortMode").value;
-    const randomYearMode = document.getElementById("randomYearMode").checked;
-
-    let publishedBefore = "";
-
-    if (randomYearMode) {
-        const randomYear = Math.floor(Math.random() * (2022 - 2005)) + 2005;
-        const randomDate = new Date(randomYear, 11, 31);
-        publishedBefore = randomDate.toISOString();
-    } else if (beforeDateInput) {
-        publishedBefore = new Date(beforeDateInput).toISOString();
-    }
-
-    if (youtubePool.length === 0) {
-
-        let collected = [];
-        let pageToken = null;
-
-        for (let i = 0; i < 3; i++) {
-
-            let url =
-                `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(query)}&maxResults=50&order=${sortMode}&key=${YT_KEYS[ytKeyIndex]}`;
-
-            if (publishedBefore) {
-                url += `&publishedBefore=${publishedBefore}`;
+        function showQuotaResetTime(resetTime) {
+            const now = Date.now();
+            const timeLeft = resetTime * 1000 - now;
+            if (timeLeft > 0) {
+                const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                document.getElementById("quotaResetTime").innerText = `Quota will reset in: ${hours}h ${minutes}m ${seconds}s`;
             }
+        }
 
-            if (pageToken) {
-                url += `&pageToken=${pageToken}`;
+        async function loadRandomVideo() {
+            try {
+                const publishedBefore = generateRandomDate();
+
+                const tagsInput = document.getElementById('tagsInput').value;
+                const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()) : [];
+
+                let query = `${t}?part=snippet&type=video&order=date&publishedBefore=${publishedBefore}&maxResults=50&key=${q[currentApiKeyIndex]}`;
+
+                if (tags.length > 0) {
+                    query += `&q=${tags.join('+')}`;
+                }
+
+                const response = await fetch(query);
+
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        currentApiKeyIndex = (currentApiKeyIndex + 1) % q.length;
+                        loadRandomVideo();
+                        return;
+                    } else {
+                        throw new Error('Failed to fetch YouTube videos');
+                    }
+                }
+
+                const data = await response.json();
+
+                if (!data.items || data.items.length === 0) {
+                    throw new Error('No videos found for the selected filters');
+                }
+
+                const videos = data.items;
+                const filteredVideos = [];
+
+                for (let video of videos) {
+                    if (!video.id || !video.id.videoId) {
+                        console.error('Skipping video with missing id:', video);
+                        continue;
+                    }
+
+                    const videoId = video.id.videoId;
+
+                    if (previousVideos.includes(videoId)) {
+                        continue;
+                    }
+
+                    const videoDetails = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoId}&key=${q[currentApiKeyIndex]}`);
+                    const detailsData = await videoDetails.json();
+
+                    if (!detailsData.items || detailsData.items.length === 0) {
+                        console.error('Skipping video with missing statistics:', video);
+                        continue;
+                    }
+
+                    const viewCount = parseInt(detailsData.items[0].statistics.viewCount);
+                    if (viewCount < 1000) {
+                        filteredVideos.push(video);
+                    }
+                }
+
+                if (filteredVideos.length === 0) {
+                    throw new Error('No videos found with fewer than 1000 views and older than 5 years');
+                }
+
+                const randomIndex = Math.floor(Math.random() * filteredVideos.length);
+                const randomVideo = filteredVideos[randomIndex];
+                const videoUrl = `https://www.youtube.com/embed/${randomVideo.id.videoId}`;
+
+                previousVideos.push(randomVideo.id.videoId);
+
+                document.getElementById("videoFrame").src = videoUrl;
+
+                showError('');
+
+            } catch (error) {
+                console.error('Error loading random YouTube video:', error);
+                showError(error.message);
             }
+        }
 
-            const response = await fetch(url);
+        async function handleQuotaError(response) {
+            const resetTime = response.headers.get('X-RateLimit-Reset');
+            if (resetTime) {
+                showQuotaResetTime(Number(resetTime));
+            }
+        }
 
+        // Add error handling for the quota reset
+        window.addEventListener('load', async () => {
+            const response = await fetch(`${t}?part=snippet&key=${q[currentApiKeyIndex]}`);
             if (response.status === 403) {
-                ytKeyIndex = (ytKeyIndex + 1) % YT_KEYS.length;
-                isLoading = false;
-                return loadYouTube(frame, query);
+                await handleQuotaError(response);
             }
-
-            if (!response.ok) {
-                isLoading = false;
-                throw new Error("YouTube search failed.");
-            }
-
-            const data = await response.json();
-
-            if (!data.items) break;
-
-            collected.push(...data.items);
-            pageToken = data.nextPageToken;
-
-            if (!pageToken) break;
-        }
-
-        if (collected.length === 0) {
-            isLoading = false;
-            alert("No YouTube results found.");
-            return;
-        }
-
-        const ids = collected.map(v => v.id.videoId).join(",");
-
-        const statsResponse = await fetch(
-            `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids}&key=${YT_KEYS[ytKeyIndex]}`
-        );
-
-        if (!statsResponse.ok) {
-            isLoading = false;
-            throw new Error("Stats request failed.");
-        }
-
-        const statsData = await statsResponse.json();
-
-        const obscure = statsData.items.filter(video =>
-            parseInt(video.statistics.viewCount) <= viewLimit
-        );
-
-        if (obscure.length === 0) {
-            isLoading = false;
-            alert("No obscure videos found.");
-            return;
-        }
-
-        youtubePool = obscure.sort(() => 0.5 - Math.random());
-    }
-
-    youtubePool = youtubePool.filter(v => !playedVideos.has(v.id));
-
-    if (youtubePool.length === 0) {
-        playedVideos.clear();
-        isLoading = false;
-        return loadYouTube(frame, query);
-    }
-
-    const nextVideo = youtubePool.pop();
-
-    playedVideos.add(nextVideo.id);
-
-    frame.src = `https://www.youtube.com/embed/${nextVideo.id}?autoplay=1`;
-
-    isLoading = false;
-}
-
-/* ================= AUTOPLAY ================= */
-
-document.getElementById("videoFrame").addEventListener("load", () => {
-
-    if (!document.getElementById("autoPlayToggle").checked) return;
-
-    setTimeout(() => {
-        loadVideo();
-    }, 15000); // change delay if desired
-});
-
-/* ================= RANDOM WORD ================= */
-
-function getRandomWord() {
-    const words = [
-        "hello","random","music","gaming","vlog",
-        "funny","2008","tutorial","old","test"
-    ];
-    return words[Math.floor(Math.random() * words.length)];
-}
-
-</script>
-
+        });
+    </script>
 </body>
 </html>
