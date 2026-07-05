@@ -6,110 +6,264 @@
 <title>ObscureYT</title>
 
 <style>
-body {
-    font-family: Arial, sans-serif;
-    background-color: #ccc;
-    color: #333;
-    text-align: center;
-}
+    :root {
+        --bg: #0d0f12;
+        --panel: #14171c;
+        --panel-border: #262b33;
+        --text: #d7dde3;
+        --text-dim: #7b8794;
+        --accent: #39ff88;
+        --accent-dim: #1f8f52;
+        --danger: #ff6b6b;
+    }
 
-h1 {
-    font-size: 24px;
-    font-weight: bold;
-    background-color: #eee;
-    padding: 10px;
-    border-bottom: 2px solid #aaa;
-}
+    * { box-sizing: border-box; }
 
-iframe {
-    width: 640px;
-    height: 360px;
-    border: 3px solid #999;
-    background-color: black;
-    margin-top: 20px;
-}
+    body {
+        font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+        background: var(--bg);
+        background-image:
+            radial-gradient(circle at 20% 0%, rgba(57, 255, 136, 0.06), transparent 40%),
+            radial-gradient(circle at 80% 100%, rgba(57, 255, 136, 0.05), transparent 40%);
+        color: var(--text);
+        min-height: 100vh;
+        margin: 0;
+        padding: 40px 16px;
+        display: flex;
+        justify-content: center;
+    }
 
-button {
-    background-color: #d6d6d6;
-    border: 1px solid #888;
-    padding: 8px 15px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
-}
+    .app {
+        width: 100%;
+        max-width: 520px;
+    }
 
-button:hover {
-    background-color: #c2c2c2;
-}
+    .titlebar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-bottom: none;
+        border-radius: 10px 10px 0 0;
+    }
 
-select, input {
-    padding: 5px;
-    font-size: 14px;
-    margin-top: 5px;
-}
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #3a3f47;
+    }
 
-input[type="text"] {
-    width: 300px;
-    border: 1px solid #888;
-}
+    .titlebar-label {
+        margin-left: 6px;
+        font-size: 12px;
+        color: var(--text-dim);
+        letter-spacing: 0.04em;
+    }
+
+    h1 {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        margin: 0;
+        padding: 16px 20px 4px;
+        color: var(--accent);
+    }
+
+    h1::before {
+        content: "> ";
+        color: var(--accent-dim);
+    }
+
+    .subtitle {
+        margin: 0;
+        padding: 0 20px 16px;
+        font-size: 12px;
+        color: var(--text-dim);
+    }
+
+    .panel {
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-top: none;
+        border-radius: 0 0 10px 10px;
+        padding: 20px;
+    }
+
+    .field {
+        margin-bottom: 16px;
+    }
+
+    .field label {
+        display: block;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-dim);
+        margin-bottom: 6px;
+    }
+
+    .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select {
+        width: 100%;
+        background: #0b0d10;
+        color: var(--text);
+        border: 1px solid var(--panel-border);
+        border-radius: 6px;
+        padding: 9px 10px;
+        font-family: inherit;
+        font-size: 13px;
+        outline: none;
+        transition: border-color 0.15s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="date"]:focus,
+    select:focus {
+        border-color: var(--accent-dim);
+    }
+
+    .checks {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 18px;
+    }
+
+    .check {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--text-dim);
+        cursor: pointer;
+    }
+
+    .check input {
+        accent-color: var(--accent);
+        cursor: pointer;
+    }
+
+    button {
+        width: 100%;
+        background: var(--accent);
+        color: #04150a;
+        border: none;
+        border-radius: 6px;
+        padding: 12px;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        transition: background 0.15s ease, transform 0.05s ease;
+    }
+
+    button:hover { background: #4dffa0; }
+    button:active { transform: scale(0.99); }
+
+    .screen {
+        margin-top: 18px;
+        border: 1px solid var(--panel-border);
+        border-radius: 10px;
+        padding: 10px;
+        background: #000;
+        box-shadow: 0 0 0 1px rgba(57, 255, 136, 0.08), 0 0 24px rgba(57, 255, 136, 0.05);
+    }
+
+    iframe {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        height: auto;
+        border: none;
+        border-radius: 4px;
+        display: block;
+        background: black;
+    }
 </style>
 </head>
 
 <body>
 
-<h1>ObscureYT</h1>
+<div class="app">
 
-<br>
+    <div class="titlebar">
+        <div class="dot" style="background:#ff6058;"></div>
+        <div class="dot" style="background:#ffbd2e;"></div>
+        <div class="dot" style="background:#27c93f;"></div>
+        <span class="titlebar-label">obscure_yt.sh</span>
+    </div>
 
-<input type="text" id="searchInput" placeholder="Enter search terms...">
+    <h1>ObscureYT</h1>
+    <p class="subtitle">dig up YouTube videos almost nobody has watched</p>
 
-<br><br>
+    <div class="panel">
 
-<label><b>Published Before:</b></label>
-<input type="date" id="beforeDate">
+        <div class="field">
+            <label for="searchInput">Search terms</label>
+            <input type="text" id="searchInput" placeholder="e.g. vlog, tutorial, 2009...">
+        </div>
 
-<br><br>
+        <div class="row">
+            <div class="field">
+                <label for="beforeDate">Published before</label>
+                <input type="date" id="beforeDate">
+            </div>
 
-<label><b>Max Views:</b></label>
-<input type="range" id="viewLimit" min="100" max="50000" step="100" value="5000"
-oninput="document.getElementById('viewValue').innerText = this.value">
-<span id="viewValue">5000</span>
+            <div class="field">
+                <label for="viewLimit">Max views</label>
+                <input type="number" id="viewLimit" min="0" step="100" value="5000" placeholder="5000">
+            </div>
+        </div>
 
-<br><br>
+        <div class="row">
+            <div class="field">
+                <label for="sortMode">Sort mode</label>
+                <select id="sortMode">
+                    <option value="date">Newest first</option>
+                    <option value="viewCount">Lowest views first</option>
+                    <option value="relevance">Relevance</option>
+                </select>
+            </div>
 
-<label><b>Sort Mode:</b></label>
-<select id="sortMode">
-    <option value="date">Newest First</option>
-    <option value="viewCount">Lowest Views First</option>
-    <option value="relevance">Relevance</option>
-</select>
+            <div class="field" style="display:flex; align-items:flex-end;">
+                <div class="checks" style="margin-bottom:9px;">
+                    <label class="check">
+                        <input type="checkbox" id="randomYearMode">
+                        Random year
+                    </label>
+                    <label class="check">
+                        <input type="checkbox" id="autoPlayToggle">
+                        Autoplay
+                    </label>
+                </div>
+            </div>
+        </div>
 
-<br><br>
+        <button onclick="loadVideo()">Search / Load Video</button>
 
-<label>
-<input type="checkbox" id="randomYearMode">
-Random Year 
-</label>
+        <div class="screen">
+            <iframe id="videoFrame" allowfullscreen></iframe>
+        </div>
 
-<br>
-
-<label>
-<input type="checkbox" id="autoPlayToggle">
- Autoplay
-</label>
-
-<br><br>
-
-<button onclick="loadVideo()">Search / Load Video</button>
-
-<br>
-
-<iframe id="videoFrame" allowfullscreen></iframe>
+    </div>
+</div>
 
 <script>
 
-/* ================= CONFIG ================= */
+/* =====================================================================
+   CONFIG
+   ===================================================================== */
 
 const YT_KEYS = [
     "AIzaSyAz_rSdU2nxA6EzFfPDHAWglPjPWfQpn5A",
@@ -119,156 +273,245 @@ const YT_KEYS = [
     "AIzaSyDokI4VAgm_s5jxMrPsFG4d9u6GfTWmeT4"
 ];
 
+const RANDOM_WORDS = [
+    "hello", "random", "music", "gaming", "vlog",
+    "funny", "2008", "tutorial", "old", "test"
+];
+
+const DEFAULT_VIEW_LIMIT = 5000;
+const MAX_SEARCH_PAGES = 3;   // how many pages of 50 search results to pull
+const STATS_CHUNK_SIZE = 50;  // YouTube "videos" endpoint id limit
+
+/* =====================================================================
+   STATE
+   ===================================================================== */
 
 let ytKeyIndex = 0;
-
-let playedVideos = new Set();
-let youtubePool = [];
 let isLoading = false;
 
-/* ================= MAIN ================= */
+// Videos already shown to the user for the CURRENT search settings.
+let playedVideos = new Set();
 
-async function loadVideo() {
+// Remaining candidate videos for the CURRENT search settings.
+let youtubePool = [];
 
-    const searchValue = document.getElementById("searchInput").value.trim();
-    const query = searchValue !== "" ? searchValue : getRandomWord();
+// Fingerprint of the settings that produced `youtubePool`, so we know
+// when to throw the cache away and fetch fresh results.
+let lastSearchSignature = null;
 
-    await loadYouTube(document.getElementById("videoFrame"), query);
+/* =====================================================================
+   SETTINGS HELPERS
+   ===================================================================== */
+
+function readSettings() {
+    const rawViewLimit = parseInt(document.getElementById("viewLimit").value);
+    const viewLimit = Number.isFinite(rawViewLimit) && rawViewLimit > 0
+        ? rawViewLimit
+        : DEFAULT_VIEW_LIMIT;
+
+    return {
+        searchValue: document.getElementById("searchInput").value.trim(),
+        beforeDateInput: document.getElementById("beforeDate").value,
+        viewLimit,
+        sortMode: document.getElementById("sortMode").value,
+        randomYearMode: document.getElementById("randomYearMode").checked
+    };
 }
 
-/* ================= YOUTUBE ================= */
+function resolvePublishedBefore(settings) {
+    if (settings.randomYearMode) {
+        const randomYear = Math.floor(Math.random() * (2022 - 2005)) + 2005;
+        return new Date(randomYear, 11, 31).toISOString();
+    }
+    if (settings.beforeDateInput) {
+        return new Date(settings.beforeDateInput).toISOString();
+    }
+    return "";
+}
 
-async function loadYouTube(frame, query) {
+function getRandomWord() {
+    return RANDOM_WORDS[Math.floor(Math.random() * RANDOM_WORDS.length)];
+}
 
+// A signature that changes whenever the user changes any setting that
+// should invalidate the cached results pool. "Random Year" mode always
+// gets a fresh signature since it's meant to reroll every time.
+function buildSearchSignature(query, settings, publishedBefore) {
+    if (settings.randomYearMode) {
+        return `random:${Date.now()}:${Math.random()}`;
+    }
+    return JSON.stringify({
+        query,
+        publishedBefore,
+        viewLimit: settings.viewLimit,
+        sortMode: settings.sortMode
+    });
+}
+
+/* =====================================================================
+   YOUTUBE API
+   ===================================================================== */
+
+async function fetchSearchResults(query, publishedBefore) {
+    let collected = [];
+    let pageToken = null;
+
+    for (let i = 0; i < MAX_SEARCH_PAGES; i++) {
+        let url =
+            `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video` +
+            `&q=${encodeURIComponent(query)}&maxResults=50` +
+            `&order=${document.getElementById("sortMode").value}` +
+            `&key=${YT_KEYS[ytKeyIndex]}`;
+
+        if (publishedBefore) url += `&publishedBefore=${publishedBefore}`;
+        if (pageToken) url += `&pageToken=${pageToken}`;
+
+        const response = await fetch(url);
+
+        if (response.status === 403) {
+            ytKeyIndex = (ytKeyIndex + 1) % YT_KEYS.length;
+            return { rotateKey: true };
+        }
+        if (!response.ok) {
+            throw new Error("YouTube search failed.");
+        }
+
+        const data = await response.json();
+        if (!data.items) break;
+
+        collected.push(...data.items);
+        pageToken = data.nextPageToken;
+        if (!pageToken) break;
+    }
+
+    return { rotateKey: false, items: collected };
+}
+
+async function fetchStatistics(videoIds) {
+    let allStats = [];
+
+    for (let i = 0; i < videoIds.length; i += STATS_CHUNK_SIZE) {
+        const chunk = videoIds.slice(i, i + STATS_CHUNK_SIZE);
+
+        const statsResponse = await fetch(
+            `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${chunk.join(",")}&key=${YT_KEYS[ytKeyIndex]}`
+        );
+
+        if (statsResponse.status === 403) {
+            ytKeyIndex = (ytKeyIndex + 1) % YT_KEYS.length;
+            return { rotateKey: true };
+        }
+        if (!statsResponse.ok) {
+            throw new Error("Stats request failed.");
+        }
+
+        const statsData = await statsResponse.json();
+        allStats.push(...statsData.items);
+    }
+
+    return { rotateKey: false, items: allStats };
+}
+
+/* =====================================================================
+   POOL MANAGEMENT
+   ===================================================================== */
+
+// Builds a fresh, shuffled pool of "obscure" videos (under the view
+// limit) for the given query/settings. Returns [] if nothing matched.
+async function buildObscurePool(query, publishedBefore, viewLimit) {
+    const searchResult = await fetchSearchResults(query, publishedBefore);
+    if (searchResult.rotateKey) return { rotateKey: true };
+
+    const uniqueIds = [...new Set(searchResult.items.map(v => v.id.videoId))];
+    if (uniqueIds.length === 0) return { rotateKey: false, pool: [] };
+
+    const statsResult = await fetchStatistics(uniqueIds);
+    if (statsResult.rotateKey) return { rotateKey: true };
+
+    const obscure = statsResult.items.filter(video =>
+        parseInt(video.statistics.viewCount) <= viewLimit
+    );
+
+    // Shuffle so repeated draws from the same pool don't always come
+    // out in the same order.
+    const shuffled = obscure.sort(() => 0.5 - Math.random());
+
+    return { rotateKey: false, pool: shuffled };
+}
+
+/* =====================================================================
+   MAIN
+   ===================================================================== */
+
+async function loadVideo() {
+    const frame = document.getElementById("videoFrame");
+    const settings = readSettings();
+    const query = settings.searchValue !== "" ? settings.searchValue : getRandomWord();
+
+    await loadYouTube(frame, query, settings);
+}
+
+async function loadYouTube(frame, query, settings) {
     if (isLoading) return;
     isLoading = true;
 
-    const beforeDateInput = document.getElementById("beforeDate").value;
-    const viewLimit = parseInt(document.getElementById("viewLimit").value);
-    const sortMode = document.getElementById("sortMode").value;
-    const randomYearMode = document.getElementById("randomYearMode").checked;
+    try {
+        const publishedBefore = resolvePublishedBefore(settings);
+        const signature = buildSearchSignature(query, settings, publishedBefore);
 
-    let publishedBefore = "";
-
-    if (randomYearMode) {
-        const randomYear = Math.floor(Math.random() * (2022 - 2005)) + 2005;
-        const randomDate = new Date(randomYear, 11, 31);
-        publishedBefore = randomDate.toISOString();
-    } else if (beforeDateInput) {
-        publishedBefore = new Date(beforeDateInput).toISOString();
-    }
-
-    if (youtubePool.length === 0) {
-
-        let collected = [];
-        let pageToken = null;
-
-        for (let i = 0; i < 3; i++) {
-
-            let url =
-                `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(query)}&maxResults=50&order=${sortMode}&key=${YT_KEYS[ytKeyIndex]}`;
-
-            if (publishedBefore) {
-                url += `&publishedBefore=${publishedBefore}`;
-            }
-
-            if (pageToken) {
-                url += `&pageToken=${pageToken}`;
-            }
-
-            const response = await fetch(url);
-
-            if (response.status === 403) {
-                ytKeyIndex = (ytKeyIndex + 1) % YT_KEYS.length;
-                isLoading = false;
-                return loadYouTube(frame, query);
-            }
-
-            if (!response.ok) {
-                isLoading = false;
-                throw new Error("YouTube search failed.");
-            }
-
-            const data = await response.json();
-
-            if (!data.items) break;
-
-            collected.push(...data.items);
-            pageToken = data.nextPageToken;
-
-            if (!pageToken) break;
+        // Settings changed since the last search (or this is the first
+        // search) -> throw away the old cached pool and start clean.
+        if (signature !== lastSearchSignature) {
+            youtubePool = [];
+            playedVideos = new Set();
+            lastSearchSignature = signature;
         }
 
-        if (collected.length === 0) {
+        // Refill the pool if it's empty.
+        if (youtubePool.length === 0) {
+            const result = await buildObscurePool(query, publishedBefore, settings.viewLimit);
+
+            if (result.rotateKey) {
+                isLoading = false;
+                return loadYouTube(frame, query, settings);
+            }
+
+            if (result.pool.length === 0) {
+                isLoading = false;
+                alert("No obscure videos found for these settings. Try a different search, date, or view limit.");
+                return;
+            }
+
+            youtubePool = result.pool;
+        }
+
+        // Remove anything we've already shown for this exact search.
+        youtubePool = youtubePool.filter(v => !playedVideos.has(v.id));
+
+        if (youtubePool.length === 0) {
+            // We've shown every obscure video that matches these exact
+            // settings. Rather than silently looping back and replaying
+            // the same handful of videos, let the user know and stop -
+            // they can tweak the search for fresh results.
             isLoading = false;
-            alert("No YouTube results found.");
+            alert("You've seen every obscure video matching this search. Try changing the search terms, date, or view limit for more.");
             return;
         }
 
-        // 🔥 REMOVE DUPLICATES
-        const uniqueIds = [...new Set(collected.map(v => v.id.videoId))];
+        const nextVideo = youtubePool.pop();
+        playedVideos.add(nextVideo.id);
 
-        let allStats = [];
-
-        // 🔥 CHUNK INTO 50 MAX (API LIMIT)
-        for (let i = 0; i < uniqueIds.length; i += 50) {
-
-            const chunk = uniqueIds.slice(i, i + 50);
-
-            const statsResponse = await fetch(
-                `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${chunk.join(",")}&key=${YT_KEYS[ytKeyIndex]}`
-            );
-
-            if (statsResponse.status === 403) {
-                ytKeyIndex = (ytKeyIndex + 1) % YT_KEYS.length;
-                isLoading = false;
-                return loadYouTube(frame, query);
-            }
-
-            if (!statsResponse.ok) {
-                isLoading = false;
-                throw new Error("Stats request failed.");
-            }
-
-            const statsData = await statsResponse.json();
-            allStats.push(...statsData.items);
-        }
-
-        const obscure = allStats.filter(video =>
-            parseInt(video.statistics.viewCount) <= viewLimit
-        );
-
-        if (obscure.length === 0) {
-            isLoading = false;
-            alert("No obscure videos found.");
-            return;
-        }
-
-        youtubePool = obscure.sort(() => 0.5 - Math.random());
-    }
-
-    // 🔥 Prevent repeats
-    youtubePool = youtubePool.filter(v => !playedVideos.has(v.id));
-
-    if (youtubePool.length === 0) {
-        playedVideos.clear();
+        frame.src = `https://www.youtube.com/embed/${nextVideo.id}?autoplay=1`;
+    } finally {
         isLoading = false;
-        return loadYouTube(frame, query);
     }
-
-    const nextVideo = youtubePool.pop();
-
-    playedVideos.add(nextVideo.id);
-
-    frame.src = `https://www.youtube.com/embed/${nextVideo.id}?autoplay=1`;
-
-    isLoading = false;
 }
 
-/* ================= AUTOPLAY ================= */
+/* =====================================================================
+   AUTOPLAY
+   ===================================================================== */
 
 document.getElementById("videoFrame").addEventListener("load", () => {
-
     if (!document.getElementById("autoPlayToggle").checked) return;
 
     setTimeout(() => {
@@ -276,19 +519,7 @@ document.getElementById("videoFrame").addEventListener("load", () => {
     }, 15000); // change delay if desired
 });
 
-/* ================= RANDOM WORD ================= */
-
-function getRandomWord() {
-    const words = [
-        "hello","random","music","gaming","vlog",
-        "funny","2008","tutorial","old","test"
-    ];
-    return words[Math.floor(Math.random() * words.length)];
-}
-
 </script>
 
 </body>
 </html>
-
-
